@@ -3,14 +3,11 @@ import { NextResponse } from 'next/server';
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    console.log("Payload Imou Masuk:", JSON.stringify(body, null, 2));
-
-    const data = body.data || body;
+    const payload = body.data || body.params || body;
     
-    const status = (data.status || body.status || '').toString().toLowerCase();
-    const type = (data.type || body.type || body.msgType || '').toString().toLowerCase();
+    const status = (payload.status || body.status || '').toString().toLowerCase();
+    const type = (payload.type || body.type || body.msgType || '').toString().toLowerCase();
 
-    // Deteksi event CCTV Offline
     const isOffline = 
       status === 'offline' || 
       status === '0' || 
@@ -18,27 +15,32 @@ export async function POST(req: Request) {
       type.includes('devicestatus');
 
     if (isOffline) {
-      const cname = data.deviceName || data.channelName || body.deviceName || 'CCTV Unknown';
-      
-      const time = new Date().toLocaleString('id-ID', {
+      // 1. Simpan Waktu Awal Pertama Kali Terdeteksi Offline
+      const initialDetectedTime = new Date().toLocaleString('id-ID', {
         dateStyle: 'medium',
         timeStyle: 'short',
         timeZone: 'Asia/Jakarta',
       });
 
-      // Template pesan tanpa nama teknisi
-      const message = 
+      const deviceId = payload.deviceId || body.deviceId;
+      const cname = payload.deviceName || payload.channelName || body.deviceName || 'CCTV Unknown';
+
+      // 2. Lakukan Ping 3 Kali (Jeda 3 Detik per Ping)
+      const isConfirmedOffline = await verifyDeviceOfflineWithRetry(deviceId, 3, 3000);
+
+      // 3. Kirim Alert Menggunakan Waktu Pengecekan Pertama Awal
+      if (isConfirmedOffline) {
+        const message = 
 `<b>⚠️ CCTV TIDAK BERFUNGSI</b>
 
 📷 ${cname}
-🕐 Terdeteksi: ${time}
+🕐 Terdeteksi: ${initialDetectedTime}
 
 Mohon segera dicek oleh teknisi.`;
 
-      const teleRes = await sendTelegramAlert(message);
-      
-      if (!teleRes.ok) {
-        console.error("Telegram API Error:", await teleRes.json());
+        await sendTelegramAlert(message);
+      } else {
+        console.log(`CCTV ${cname} hanya mengalami fluktuasi sementara. Alert dibatalkan.`);
       }
     }
 
@@ -47,6 +49,34 @@ Mohon segera dicek oleh teknisi.`;
     console.error('Webhook Error:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
+}
+
+// Fungsi Pengecekan 3x Loop dengan Jeda 3000ms (3 Detik)
+async function verifyDeviceOfflineWithRetry(deviceId: string, maxRetries = 3, delayMs = 3000): Promise<boolean> {
+  if (!deviceId) return true; 
+
+  for (let i = 1; i <= maxRetries; i++) {
+    console.log(`[Ping Check ${i}/${maxRetries}] Memeriksa status device ${deviceId}...`);
+    
+    const isStillOffline = await checkImouDeviceStatusApi(deviceId);
+
+    // Jika pada salah satu ping kamera ternyata Online kembali, langsung batalkan
+    if (!isStillOffline) {
+      return false; 
+    }
+
+    // Tunggu 3 detik sebelum ping berikutnya
+    if (i < maxRetries) {
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+    }
+  }
+
+  return true; // Terbukti offline selama 3x ping berturut-turut
+}
+
+async function checkImouDeviceStatusApi(deviceId: string): Promise<boolean> {
+  // Placeholder pengecekan status ke OpenAPI Imou
+  return true; 
 }
 
 async function sendTelegramAlert(text: string) {
