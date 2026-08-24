@@ -99,7 +99,7 @@ export async function POST(req: Request) {
       });
 
       // 2. Ambil ID/Serial Number dari payload Imou
-      const deviceId = payload.deviceId || payload.sn || body.deviceId || '';
+      const deviceId = payload.deviceId || payload.deviceSn || payload.sn || body.deviceId || body.deviceSn || payload.content?.deviceSn || payload.content?.deviceId || '';
       
       // 3. Konversi ID ke Nama Kamera Resmi via DEVICE_MAP
       const cname = 
