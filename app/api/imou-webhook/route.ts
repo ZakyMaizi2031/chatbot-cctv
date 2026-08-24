@@ -73,6 +73,13 @@ const DEVICE_MAP: Record<string, string> = {
   '8E0250FPAZC7682': '8E0250FPAZC7682-1',
 };
 
+// Menyimpan state terakhir CCTV di memory (gunakan global agar bertahan di Next.js dev)
+const globalAny: any = global;
+if (!globalAny.cctvStates) {
+  globalAny.cctvStates = new Map<string, string>();
+}
+const cctvStates: Map<string, string> = globalAny.cctvStates;
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -80,56 +87,76 @@ export async function POST(req: Request) {
 
     const payload = body.data || body.params || body;
     
-    const status = (payload.status || body.status || '').toString().toLowerCase();
-    const type = (payload.type || body.type || body.msgType || '').toString().toLowerCase();
+    const status = (payload.status || body.status || payload.content?.status || '').toString().toLowerCase();
+    const type = (payload.type || body.type || body.msgType || payload.content?.type || '').toString().toLowerCase();
 
-    // Deteksi jika CCTV Offline
-    const isOffline = 
-      status === 'offline' || 
-      status === '0' || 
-      type.includes('offline') || 
-      type.includes('devicestatus');
+    // Ambil ID/Serial Number dari payload Imou
+    const deviceId = payload.deviceId || payload.deviceSn || payload.sn || body.deviceId || body.deviceSn || payload.content?.deviceSn || payload.content?.deviceId || '';
+    
+    // Konversi ID ke Nama Kamera Resmi via DEVICE_MAP
+    const cname = 
+      DEVICE_MAP[deviceId] || 
+      payload.deviceName || 
+      payload.channelName || 
+      body.deviceName || 
+      'CCTV Unknown';
 
-    if (isOffline) {
-      // 1. Simpan waktu deteksi awal
-      const initialDetectedTime = new Date().toLocaleString('id-ID', {
-        dateStyle: 'medium',
-        timeStyle: 'short',
-        timeZone: 'Asia/Jakarta',
-      });
+    // Deteksi Event Status
+    const isOfflineEvent = status === 'offline' || status === '0' || type.includes('offline');
+    const isOnlineEvent = status === 'online' || status === '1' || type.includes('online');
+    
+    // Jika event berupa 'devicestatus' tapi tidak jelas statusnya, fallback berdasarkan field status jika ada
+    const isStatusUpdate = type.includes('devicestatus');
+    const actuallyOffline = isOfflineEvent || (isStatusUpdate && (status === 'offline' || status === '0'));
+    const actuallyOnline = isOnlineEvent || (isStatusUpdate && (status === 'online' || status === '1'));
 
-      // 2. Ambil ID/Serial Number dari payload Imou
-      const deviceId = payload.deviceId || payload.deviceSn || payload.sn || body.deviceId || body.deviceSn || payload.content?.deviceSn || payload.content?.deviceId || '';
-      
-      // 3. Konversi ID ke Nama Kamera Resmi via DEVICE_MAP
-      const cname = 
-        DEVICE_MAP[deviceId] || 
-        payload.deviceName || 
-        payload.channelName || 
-        body.deviceName || 
-        'CCTV Unknown';
+    const currentState = cctvStates.get(deviceId) || 'online'; // Anggap online by default
+    const currentTime = new Date().toLocaleString('id-ID', {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+      timeZone: 'Asia/Jakarta',
+    });
 
-      // 4. Lakukan Ping Verifikasi 3 kali (Jeda 3 detik per ping)
-      const isConfirmedOffline = await verifyDeviceOfflineWithRetry(deviceId, 3, 3000);
+    if (actuallyOffline) {
+      if (currentState === 'offline') {
+        console.log(`CCTV ${cname} (${deviceId}) sudah offline sebelumnya. Abaikan pesan ganda.`);
+      } else {
+        // Lakukan Ping Verifikasi 3 kali (Jeda 3 detik per ping)
+        const isConfirmedOffline = await verifyDeviceOfflineWithRetry(deviceId, 3, 3000);
 
-      // 5. Kirim Telegram jika terverifikasi offline
-      if (isConfirmedOffline) {
-        const message = 
+        if (isConfirmedOffline) {
+          cctvStates.set(deviceId, 'offline'); // Update status
+
+          const message = 
 `<b>⚠️ CCTV TIDAK BERFUNGSI</b>
 
 📷 Device: <b>${cname}</b>
 🆔 Device ID: <code>${deviceId || '-'}</code>
-🕐 Terdeteksi: ${initialDetectedTime}
+🕐 Terdeteksi: ${currentTime}
 
 Mohon segera dicek oleh teknisi.`;
 
-        const teleRes = await sendTelegramAlert(message);
-        
-        if (!teleRes.ok) {
-          console.error("Telegram API Error:", await teleRes.json());
+          const teleRes = await sendTelegramAlert(message);
+          if (!teleRes.ok) console.error("Telegram API Error:", await teleRes.json());
         }
+      }
+    } else if (actuallyOnline) {
+      if (currentState === 'offline') {
+        cctvStates.set(deviceId, 'online'); // Update status kembali online
+
+        const message = 
+`<b>✅ CCTV KEMBALI NORMAL</b>
+
+📷 Device: <b>${cname}</b>
+🆔 Device ID: <code>${deviceId || '-'}</code>
+🕐 Waktu Pulih: ${currentTime}
+
+CCTV telah beroperasi dan terhubung kembali.`;
+
+        const teleRes = await sendTelegramAlert(message);
+        if (!teleRes.ok) console.error("Telegram API Error:", await teleRes.json());
       } else {
-        console.log(`CCTV ${cname} (${deviceId}) kembali Online. Alert dibatalkan.`);
+        console.log(`CCTV ${cname} (${deviceId}) sudah online. Abaikan pesan ganda.`);
       }
     }
 
