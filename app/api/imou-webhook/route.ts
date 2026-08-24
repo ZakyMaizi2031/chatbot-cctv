@@ -91,14 +91,16 @@ export async function POST(req: Request) {
     const type = (payload.type || body.type || body.msgType || payload.content?.type || '').toString().toLowerCase();
 
     // Ambil ID/Serial Number dari payload Imou
-    const deviceId = payload.deviceId || payload.deviceSn || payload.sn || body.deviceId || body.deviceSn || payload.content?.deviceSn || payload.content?.deviceId || '';
+    const deviceId = payload.deviceId || payload.deviceSn || payload.sn || payload.did || body.deviceId || body.deviceSn || body.did || payload.content?.deviceSn || payload.content?.deviceId || payload.content?.did || '';
     
     // Konversi ID ke Nama Kamera Resmi via DEVICE_MAP
     const cname = 
       DEVICE_MAP[deviceId] || 
       payload.deviceName || 
+      payload.dname || 
       payload.channelName || 
       body.deviceName || 
+      body.dname || 
       'CCTV Unknown';
 
     // Deteksi Event Status
