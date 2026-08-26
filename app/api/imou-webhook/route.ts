@@ -129,11 +129,11 @@ export async function POST(req: Request) {
           LIMIT 1
         `;
         if (lastLog.length > 0) {
-          currentState = lastLog[0].status;
+          currentState = lastLog[0].status as string;
         } else {
           currentState = 'online'; // Anggap online by default jika tidak ada riwayat mati
         }
-        cctvStates.set(deviceId, currentState);
+        cctvStates.set(deviceId as string, currentState as string);
       } catch (dbErr) {
         console.error("Gagal baca status dari DB:", dbErr);
         currentState = 'online';
