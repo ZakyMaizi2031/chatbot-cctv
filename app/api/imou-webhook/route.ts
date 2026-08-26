@@ -117,29 +117,7 @@ export async function POST(req: Request) {
     const actuallyOffline = isOfflineEvent || (isStatusUpdate && (status === 'offline' || status === '0'));
     const actuallyOnline = isOnlineEvent || (isStatusUpdate && (status === 'online' || status === '1'));
 
-    let currentState = cctvStates.get(deviceId);
-    
-    // Jika Vercel restart dan memory hilang, ambil status terakhir dari Database!
-    if (!currentState) {
-      try {
-        const lastLog = await sql`
-          SELECT status FROM notification_logs 
-          WHERE device_id = ${deviceId} 
-          ORDER BY created_at DESC 
-          LIMIT 1
-        `;
-        if (lastLog.length > 0) {
-          currentState = lastLog[0].status as string;
-        } else {
-          currentState = 'online'; // Anggap online by default jika tidak ada riwayat mati
-        }
-        cctvStates.set(deviceId as string, currentState as string);
-      } catch (dbErr) {
-        console.error("Gagal baca status dari DB:", dbErr);
-        currentState = 'online';
-      }
-    }
-
+    const currentState = cctvStates.get(deviceId) || 'online'; // Anggap online by default
     const currentTime = new Date().toLocaleString('id-ID', {
       dateStyle: 'medium',
       timeStyle: 'short',
@@ -174,10 +152,6 @@ Mohon segera dicek oleh teknisi.`;
               INSERT INTO notification_logs (device_id, device_name, status)
               VALUES (${deviceId}, ${cname}, 'offline')
             `;
-            // Update status terbaru di tabel daftar perangkat
-            await sql`
-              UPDATE devices SET status = 'offline', last_synced_at = NOW() WHERE device_id = ${deviceId}
-            `;
           } catch (dbErr) {
             console.error("Database Error (Offline Log):", dbErr);
           }
@@ -204,10 +178,6 @@ CCTV telah beroperasi dan terhubung kembali.`;
           await sql`
             INSERT INTO notification_logs (device_id, device_name, status)
             VALUES (${deviceId}, ${cname}, 'online')
-          `;
-          // Update status terbaru di tabel daftar perangkat
-          await sql`
-            UPDATE devices SET status = 'online', last_synced_at = NOW() WHERE device_id = ${deviceId}
           `;
         } catch (dbErr) {
           console.error("Database Error (Online Log):", dbErr);

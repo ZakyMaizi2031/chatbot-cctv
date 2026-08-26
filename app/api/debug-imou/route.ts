@@ -6,11 +6,12 @@ const APP_SECRET = (process.env.IMOU_APP_SECRET || '').trim();
 
 // Daftar semua kemungkinan URL IMOU yang perlu dicoba
 const CANDIDATE_URLS = [
-  'https://api-sg.imoulife.com/openapi/public/api',
-  'https://api.imoulife.com/openapi/public/api',
-  'https://openapi.imoulife.com/openapi/public/api',
-  'https://api-cn.imoulife.com/openapi/public/api',
+  'https://openapi-sg.easy4ip.com/openapi',
+  'https://openapi-sg.easy4ip.com/openapi/public/api',
+  'https://openapi.easy4ip.com/openapi/public/api',
+  'https://openapi.easy4ip.com/openapi'
 ];
+
 
 function buildRequestBody() {
   const time = Math.floor(Date.now() / 1000);
