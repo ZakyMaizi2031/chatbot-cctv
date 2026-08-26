@@ -57,44 +57,44 @@ async function getAccessToken(): Promise<string> {
 
 // === Step 2: Ambil Semua Device dari IMOU (dengan pagination) ===
 async function getAllDevices(token: string) {
-  const pageSize = 20; // IMOU biasanya max 20 per halaman
-  let pageNum = 1;
+  const limit = 50; // batas per halaman
+  let hasMore = true;
   const allDevices: { did: string; dname: string; status: string }[] = [];
 
-  while (true) {
-    const body = buildRequestBody({ token, pageNum, pageSize });
+  // IMOU API menggunakan parameter ini untuk deviceBaseList
+  const body = buildRequestBody({ 
+    token, 
+    bindId: -1, 
+    limit, 
+    type: 'bindDevice' 
+  });
 
-    const res = await fetch(`${IMOU_BASE_URL}/deviceList`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-      signal: AbortSignal.timeout(10000),
+  const res = await fetch(`${IMOU_BASE_URL}/deviceBaseList`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(10000),
+  });
+
+  if (!res.ok) {
+    throw new Error(`IMOU DeviceBaseList HTTP Error: ${res.status} ${res.statusText}`);
+  }
+
+  const json = await res.json();
+  console.log(`IMOU deviceBaseList response:`, JSON.stringify(json.result?.code));
+
+  if (json.result?.code !== '0') {
+    throw new Error(`IMOU DeviceBaseList Error: ${json.result?.msg || JSON.stringify(json)}`);
+  }
+
+  const deviceList = json.result?.data?.deviceList || [];
+
+  for (const d of deviceList) {
+    allDevices.push({
+      did: d.deviceId || d.did || d.sn || '',
+      dname: d.deviceName || d.name || d.dname || '',
+      status: d.status === 1 || d.status === '1' || d.onLine === 1 || d.online === true ? 'online' : 'offline',
     });
-
-    if (!res.ok) {
-      throw new Error(`IMOU DeviceList HTTP Error: ${res.status} ${res.statusText}`);
-    }
-
-    const json = await res.json();
-    console.log(`IMOU deviceList page ${pageNum}:`, JSON.stringify(json.result?.code));
-
-    if (json.result?.code !== '0') {
-      throw new Error(`IMOU DeviceList Error: ${json.result?.msg || JSON.stringify(json)}`);
-    }
-
-    const deviceList = json.result?.data?.deviceList || [];
-
-    for (const d of deviceList) {
-      allDevices.push({
-        did: d.deviceId || d.did || d.sn || '',
-        dname: d.deviceName || d.name || d.dname || '',
-        status: d.onLine === 1 || d.onLine === '1' || d.online === true ? 'online' : 'offline',
-      });
-    }
-
-    // Jika hasil kurang dari pageSize, berarti sudah halaman terakhir
-    if (deviceList.length < pageSize) break;
-    pageNum++;
   }
 
   return allDevices;
