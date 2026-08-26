@@ -3,12 +3,22 @@ import { sql } from '@/lib/db';
 export const dynamic = 'force-dynamic';
 
 export default async function AdminPanel() {
-  // Ambil semua log terbaru (50 data terakhir)
-  const logs = await sql`
+  // Ambil log offline terbaru
+  const offlineLogs = await sql`
     SELECT id, device_id, device_name, status, created_at
     FROM notification_logs
+    WHERE status = 'offline'
     ORDER BY created_at DESC
-    LIMIT 50
+    LIMIT 30
+  `;
+
+  // Ambil log online terbaru
+  const onlineLogs = await sql`
+    SELECT id, device_id, device_name, status, created_at
+    FROM notification_logs
+    WHERE status = 'online'
+    ORDER BY created_at DESC
+    LIMIT 30
   `;
 
   // Hitung jumlah offline per device
@@ -91,18 +101,19 @@ export default async function AdminPanel() {
           </div>
 
           {/* Bagian Kanan: Log Riwayat */}
-          <div className="lg:col-span-8">
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col h-full">
-              <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+          <div className="lg:col-span-8 flex flex-col gap-8">
+            
+            {/* Tabel Offline */}
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+              <div className="p-6 border-b border-slate-100 bg-red-50/30 flex items-center justify-between">
                 <div>
-                  <h2 className="text-lg font-bold flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    Log Peristiwa
+                  <h2 className="text-lg font-bold flex items-center gap-2 text-red-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    Riwayat Kamera Mati (Offline)
                   </h2>
-                  <p className="text-sm text-slate-500 mt-1">Daftar 50 notifikasi terbaru yang dikirim ke Telegram.</p>
+                  <p className="text-sm text-slate-500 mt-1">Daftar notifikasi peringatan CCTV mati terbaru.</p>
                 </div>
               </div>
-              
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
@@ -113,51 +124,81 @@ export default async function AdminPanel() {
                     </tr>
                   </thead>
                   <tbody className="text-sm divide-y divide-slate-100">
-                    {logs.map((log) => {
-                      const isOffline = log.status === 'offline';
-                      return (
-                        <tr key={log.id} className="hover:bg-slate-50/80 transition-colors group">
-                          <td className="p-5 whitespace-nowrap">
-                            <div className="text-slate-700 font-medium">
-                              {new Date(log.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
-                            </div>
-                            <div className="text-slate-400 text-xs mt-0.5">
-                              {new Date(log.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB
-                            </div>
-                          </td>
-                          <td className="p-5">
-                            <div className="font-semibold text-slate-800">{log.device_name}</div>
-                            <div className="text-slate-400 font-mono text-xs mt-0.5">{log.device_id}</div>
-                          </td>
-                          <td className="p-5 text-center">
-                            <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border ${
-                              isOffline 
-                                ? 'bg-red-50 text-red-600 border-red-200' 
-                                : 'bg-emerald-50 text-emerald-600 border-emerald-200'
-                            }`}>
-                              <span className={`w-1.5 h-1.5 rounded-full ${isOffline ? 'bg-red-500' : 'bg-emerald-500'}`}></span>
-                              {log.status.toUpperCase()}
-                            </span>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                    {logs.length === 0 && (
-                      <tr>
-                        <td colSpan={3} className="p-12 text-center">
-                          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 mb-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                            </svg>
-                          </div>
-                          <p className="text-slate-500 text-sm font-medium">Belum ada riwayat notifikasi.</p>
+                    {offlineLogs.map((log) => (
+                      <tr key={log.id} className="hover:bg-red-50/50 transition-colors group">
+                        <td className="p-5 whitespace-nowrap">
+                          <div className="text-slate-700 font-medium">{new Date(log.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                          <div className="text-slate-400 text-xs mt-0.5">{new Date(log.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB</div>
                         </td>
+                        <td className="p-5">
+                          <div className="font-semibold text-slate-800">{log.device_name}</div>
+                          <div className="text-slate-400 font-mono text-xs mt-0.5">{log.device_id}</div>
+                        </td>
+                        <td className="p-5 text-center">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border bg-red-50 text-red-600 border-red-200">
+                            <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span> OFFLINE
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                    {offlineLogs.length === 0 && (
+                      <tr>
+                        <td colSpan={3} className="p-8 text-center text-slate-500 text-sm font-medium">Belum ada riwayat kamera mati.</td>
                       </tr>
                     )}
                   </tbody>
                 </table>
               </div>
             </div>
+
+            {/* Tabel Online */}
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+              <div className="p-6 border-b border-slate-100 bg-emerald-50/30 flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg font-bold flex items-center gap-2 text-emerald-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    Riwayat Kamera Nyala (Online)
+                  </h2>
+                  <p className="text-sm text-slate-500 mt-1">Daftar notifikasi pemulihan CCTV terbaru.</p>
+                </div>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider">
+                      <th className="p-5 font-semibold">Waktu Pemulihan</th>
+                      <th className="p-5 font-semibold">Perangkat</th>
+                      <th className="p-5 font-semibold text-center">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-sm divide-y divide-slate-100">
+                    {onlineLogs.map((log) => (
+                      <tr key={log.id} className="hover:bg-emerald-50/50 transition-colors group">
+                        <td className="p-5 whitespace-nowrap">
+                          <div className="text-slate-700 font-medium">{new Date(log.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                          <div className="text-slate-400 text-xs mt-0.5">{new Date(log.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB</div>
+                        </td>
+                        <td className="p-5">
+                          <div className="font-semibold text-slate-800">{log.device_name}</div>
+                          <div className="text-slate-400 font-mono text-xs mt-0.5">{log.device_id}</div>
+                        </td>
+                        <td className="p-5 text-center">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border bg-emerald-50 text-emerald-600 border-emerald-200">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> ONLINE
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                    {onlineLogs.length === 0 && (
+                      <tr>
+                        <td colSpan={3} className="p-8 text-center text-slate-500 text-sm font-medium">Belum ada riwayat kamera menyala.</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
           </div>
 
         </div>
