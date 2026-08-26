@@ -3,51 +3,62 @@ import crypto from 'crypto';
 
 const APP_ID = (process.env.IMOU_APP_ID || '').trim();
 const APP_SECRET = (process.env.IMOU_APP_SECRET || '').trim();
+const IMOU_BASE_URL = 'https://openapi-sg.easy4ip.com/openapi';
 
-// Daftar semua kemungkinan URL IMOU yang perlu dicoba
-const CANDIDATE_URLS = [
-  'https://openapi-sg.easy4ip.com/openapi',
-  'https://openapi-sg.easy4ip.com/openapi/public/api',
-  'https://openapi.easy4ip.com/openapi/public/api',
-  'https://openapi.easy4ip.com/openapi'
-];
-
-
-function buildRequestBody() {
+function buildRequestBody(params: any = {}) {
   const time = Math.floor(Date.now() / 1000);
-  const nonce = Math.random().toString(36).substring(2, 10);
+  const nonce = crypto.randomUUID().replace(/-/g, '').substring(0, 8);
   const signRaw = `time:${time},nonce:${nonce},appSecret:${APP_SECRET}`;
   const sign = crypto.createHash('md5').update(signRaw).digest('hex');
   return {
     system: { ver: '1.0', appId: APP_ID, time, nonce, sign },
-    params: {},
+    params,
     id: crypto.randomUUID(),
   };
 }
 
 export async function GET() {
-  const results: Record<string, string> = {};
+  const results: Record<string, any> = {};
 
-  for (const baseUrl of CANDIDATE_URLS) {
-    const url = `${baseUrl}/accessToken`;
-    try {
-      const res = await fetch(url, {
+  try {
+    // 1. Get Token
+    const tokenRes = await fetch(`${IMOU_BASE_URL}/accessToken`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(buildRequestBody({})),
+    });
+    const tokenJson = await tokenRes.json();
+    const token = tokenJson.result?.data?.accessToken;
+    
+    if (!token) {
+      return NextResponse.json({ error: 'Gagal dapat token', details: tokenJson });
+    }
+
+    // Daftar skenario parameter yang akan dicoba
+    const scenarios = {
+      'deviceBaseList_numeric': { token, bindId: -1, limit: 50, type: 'bindDevice' },
+      'deviceBaseList_string': { token, bindId: "-1", limit: "50", type: 'bindDevice' },
+      'deviceList_page': { token, pageNum: 1, pageSize: 20 },
+      'deviceBaseList_onlyToken': { token },
+      'listDeviceDetailsByPage': { token, page: 1, pageSize: 20 }
+    };
+
+    for (const [name, params] of Object.entries(scenarios)) {
+      const endpoint = name.startsWith('deviceBaseList') ? '/deviceBaseList' : (name.startsWith('deviceList') ? '/deviceList' : '/listDeviceDetailsByPage');
+      
+      const res = await fetch(`${IMOU_BASE_URL}${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(buildRequestBody()),
-        signal: AbortSignal.timeout(7000),
+        body: JSON.stringify(buildRequestBody(params)),
       });
-      const text = await res.text();
-      results[baseUrl] = `HTTP ${res.status}: ${text.substring(0, 200)}`;
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : String(e);
-      results[baseUrl] = `ERROR: ${msg}`;
+      const json = await res.json();
+      results[name] = json.result?.msg || JSON.stringify(json.result);
     }
-  }
 
-  return NextResponse.json({
-    appId: APP_ID ? `${APP_ID.substring(0, 6)}***` : 'KOSONG!',
-    appSecret: APP_SECRET ? `${APP_SECRET.substring(0, 4)}***` : 'KOSONG!',
-    results,
-  });
+    return NextResponse.json({ token_sukses: true, results });
+
+  } catch (e: any) {
+    return NextResponse.json({ error: String(e) });
+  }
 }
+
