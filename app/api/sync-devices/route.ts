@@ -3,7 +3,7 @@ import crypto from 'crypto';
 import { sql } from '@/lib/db';
 
 // Base URL IMOU Open API - Singapore/APAC Region
-const IMOU_BASE_URL = 'https://api-sg.imoulife.com/openapi/public/api';
+const IMOU_BASE_URL = 'https://openapi-sg.easy4ip.com/openapi';
 const APP_ID = (process.env.IMOU_APP_ID || '').trim();
 const APP_SECRET = (process.env.IMOU_APP_SECRET || '').trim();
 
