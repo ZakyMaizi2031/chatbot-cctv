@@ -57,44 +57,45 @@ async function getAccessToken(): Promise<string> {
 
 // === Step 2: Ambil Semua Device dari IMOU (dengan pagination) ===
 async function getAllDevices(token: string) {
-  const limit = 50; // batas per halaman
-  let hasMore = true;
+  const pageSize = 50; // max device per halaman
+  let page = 1;
   const allDevices: { did: string; dname: string; status: string }[] = [];
 
-  // IMOU API menggunakan parameter ini untuk deviceBaseList
-  const body = buildRequestBody({ 
-    token, 
-    bindId: -1, 
-    limit, 
-    type: 'bindDevice' 
-  });
+  while (true) {
+    const body = buildRequestBody({ token, page, pageSize });
 
-  const res = await fetch(`${IMOU_BASE_URL}/deviceBaseList`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-    signal: AbortSignal.timeout(10000),
-  });
-
-  if (!res.ok) {
-    throw new Error(`IMOU DeviceBaseList HTTP Error: ${res.status} ${res.statusText}`);
-  }
-
-  const json = await res.json();
-  console.log(`IMOU deviceBaseList response:`, JSON.stringify(json.result?.code));
-
-  if (json.result?.code !== '0') {
-    throw new Error(`IMOU DeviceBaseList Error: ${json.result?.msg || JSON.stringify(json)}`);
-  }
-
-  const deviceList = json.result?.data?.deviceList || [];
-
-  for (const d of deviceList) {
-    allDevices.push({
-      did: d.deviceId || d.did || d.sn || '',
-      dname: d.deviceName || d.name || d.dname || '',
-      status: d.status === 1 || d.status === '1' || d.onLine === 1 || d.online === true ? 'online' : 'offline',
+    const res = await fetch(`${IMOU_BASE_URL}/listDeviceDetailsByPage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(10000),
     });
+
+    if (!res.ok) {
+      throw new Error(`IMOU HTTP Error: ${res.status} ${res.statusText}`);
+    }
+
+    const json = await res.json();
+    
+    if (json.result?.code !== '0') {
+      throw new Error(`IMOU API Error: ${json.result?.msg || JSON.stringify(json)}`);
+    }
+
+    const deviceList = json.result?.data?.deviceList || [];
+
+    for (const d of deviceList) {
+      allDevices.push({
+        did: d.deviceId || d.did || d.sn || '',
+        dname: d.deviceName || d.name || d.dname || '',
+        status: d.status === 1 || d.status === '1' || d.onLine === 1 || d.online === true ? 'online' : 'offline',
+      });
+    }
+
+    // Jika jumlah device yang dikembalikan kurang dari pageSize, berarti ini halaman terakhir
+    if (deviceList.length < pageSize) {
+      break;
+    }
+    page++;
   }
 
   return allDevices;
