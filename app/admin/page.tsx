@@ -30,6 +30,13 @@ export default async function AdminPanel() {
     ORDER BY offline_count DESC
   `;
 
+  // Ambil semua device dari database (hasil sync IMOU)
+  const devices = await sql`
+    SELECT device_id, device_name, status, last_synced_at
+    FROM devices
+    ORDER BY device_name ASC
+  `;
+
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-800 font-sans selection:bg-blue-200">
       {/* Header / Navbar */}
@@ -202,6 +209,77 @@ export default async function AdminPanel() {
           </div>
 
         </div>
+
+        {/* Bagian Bawah: Daftar Semua Perangkat IMOU */}
+        <div className="mt-8 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+          <div className="p-6 border-b border-slate-100 bg-blue-50/30 flex items-center justify-between flex-wrap gap-3">
+            <div>
+              <h2 className="text-lg font-bold flex items-center gap-2 text-blue-700">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+                Daftar Semua Perangkat CCTV (dari IMOU)
+              </h2>
+              <p className="text-sm text-slate-500 mt-1">
+                Total <span className="font-bold text-blue-700">{devices.length}</span> perangkat terdaftar. 
+                Untuk memperbarui, buka <code className="bg-slate-100 px-1.5 py-0.5 rounded text-xs font-mono text-slate-600">/api/sync-devices</code>.
+              </p>
+            </div>
+            <a
+              href="/api/sync-devices"
+              target="_blank"
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors shadow-sm shadow-blue-500/30"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21.5 2v6h-6"/><path d="M21.34 15.57a10 10 0 1 1-.57-8.38"/></svg>
+              Sinkronisasi Sekarang
+            </a>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider">
+                  <th className="p-4 font-semibold">Nama Perangkat</th>
+                  <th className="p-4 font-semibold">ID Perangkat</th>
+                  <th className="p-4 font-semibold text-center">Status Terakhir</th>
+                  <th className="p-4 font-semibold">Terakhir Disinkron</th>
+                </tr>
+              </thead>
+              <tbody className="text-sm divide-y divide-slate-100">
+                {devices.map((dev) => {
+                  const isOnline = dev.status === 'online';
+                  return (
+                    <tr key={dev.device_id} className="hover:bg-blue-50/40 transition-colors">
+                      <td className="p-4 font-semibold text-slate-800">{dev.device_name}</td>
+                      <td className="p-4 font-mono text-xs text-slate-500">{dev.device_id}</td>
+                      <td className="p-4 text-center">
+                        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border ${
+                          isOnline
+                            ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
+                            : dev.status === 'unknown'
+                              ? 'bg-slate-100 text-slate-500 border-slate-200'
+                              : 'bg-red-50 text-red-600 border-red-200'
+                        }`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${isOnline ? 'bg-emerald-500' : dev.status === 'unknown' ? 'bg-slate-400' : 'bg-red-500'}`}></span>
+                          {dev.status.toUpperCase()}
+                        </span>
+                      </td>
+                      <td className="p-4 text-xs text-slate-500">
+                        {new Date(dev.last_synced_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })}
+                      </td>
+                    </tr>
+                  );
+                })}
+                {devices.length === 0 && (
+                  <tr>
+                    <td colSpan={4} className="p-10 text-center">
+                      <p className="text-slate-500 text-sm font-medium mb-2">Belum ada data perangkat.</p>
+                      <p className="text-slate-400 text-xs">Klik tombol <strong>Sinkronisasi Sekarang</strong> di atas untuk mengambil daftar dari IMOU.</p>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
       </main>
     </div>
   );

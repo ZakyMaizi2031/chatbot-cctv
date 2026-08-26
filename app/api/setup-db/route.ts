@@ -3,7 +3,7 @@ import { sql } from '@/lib/db';
 
 export async function GET() {
   try {
-    // 1. Buat tabel jika belum ada
+    // 1. Buat tabel notification_logs jika belum ada
     await sql`
       CREATE TABLE IF NOT EXISTS notification_logs (
         id SERIAL PRIMARY KEY,
@@ -11,6 +11,16 @@ export async function GET() {
         device_name VARCHAR(255) NOT NULL,
         status VARCHAR(50) NOT NULL,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      )
+    `;
+
+    // 2. Buat tabel devices jika belum ada (untuk sinkronisasi dari IMOU API)
+    await sql`
+      CREATE TABLE IF NOT EXISTS devices (
+        device_id VARCHAR(255) PRIMARY KEY,
+        device_name VARCHAR(255) NOT NULL,
+        status VARCHAR(50) DEFAULT 'unknown',
+        last_synced_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       )
     `;
 
