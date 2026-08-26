@@ -85,11 +85,14 @@ async function getAllDevices(token: string) {
 
     for (const d of deviceList) {
       const isOnline = 
-        d.status === 1 || 
-        d.status === '1' || 
+        d.deviceStatus === 'online' ||
+        d.deviceStatus === 1 ||
+        d.status === 'online' ||
+        d.status === 1 ||
+        d.status === '1' ||
         String(d.status).toLowerCase() === 'online' ||
-        d.onLine === 1 || 
-        d.onLine === '1' || 
+        d.onLine === 1 ||
+        d.onLine === '1' ||
         d.online === true ||
         String(d.online).toLowerCase() === 'online';
 
