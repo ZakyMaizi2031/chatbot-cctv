@@ -36,23 +36,17 @@ export async function GET() {
 
     // Daftar skenario parameter yang akan dicoba
     const scenarios = {
-      'deviceBaseList_numeric': { token, bindId: -1, limit: 50, type: 'bindDevice' },
-      'deviceBaseList_string': { token, bindId: "-1", limit: "50", type: 'bindDevice' },
-      'deviceList_page': { token, pageNum: 1, pageSize: 20 },
-      'deviceBaseList_onlyToken': { token },
-      'listDeviceDetailsByPage': { token, page: 1, pageSize: 20 }
+      'listDeviceDetailsByPage': { token, page: 1, pageSize: 1 } // Ambil 1 device saja untuk diinspeksi
     };
 
     for (const [name, params] of Object.entries(scenarios)) {
-      const endpoint = name.startsWith('deviceBaseList') ? '/deviceBaseList' : (name.startsWith('deviceList') ? '/deviceList' : '/listDeviceDetailsByPage');
-      
-      const res = await fetch(`${IMOU_BASE_URL}${endpoint}`, {
+      const res = await fetch(`${IMOU_BASE_URL}/listDeviceDetailsByPage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(buildRequestBody(params)),
       });
       const json = await res.json();
-      results[name] = json.result?.msg || JSON.stringify(json.result);
+      results['raw_device_data'] = json.result?.data?.deviceList?.[0] || 'Tidak ada device yang ditemukan';
     }
 
     return NextResponse.json({ token_sukses: true, results });

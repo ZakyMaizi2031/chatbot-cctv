@@ -84,10 +84,19 @@ async function getAllDevices(token: string) {
     const deviceList = json.result?.data?.deviceList || [];
 
     for (const d of deviceList) {
+      const isOnline = 
+        d.status === 1 || 
+        d.status === '1' || 
+        String(d.status).toLowerCase() === 'online' ||
+        d.onLine === 1 || 
+        d.onLine === '1' || 
+        d.online === true ||
+        String(d.online).toLowerCase() === 'online';
+
       allDevices.push({
         did: d.deviceId || d.did || d.sn || '',
         dname: d.deviceName || d.name || d.dname || '',
-        status: d.status === 1 || d.status === '1' || d.onLine === 1 || d.online === true ? 'online' : 'offline',
+        status: isOnline ? 'online' : 'offline',
       });
     }
 
