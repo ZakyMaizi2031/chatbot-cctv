@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { sql } from '@/lib/db';
 
 // Mapping Serial Number dari Console Imou ke Nama Perangkat
 const DEVICE_MAP: Record<string, string> = {
@@ -93,14 +94,18 @@ export async function POST(req: Request) {
     // Ambil ID/Serial Number dari payload Imou
     const deviceId = payload.deviceId || payload.deviceSn || payload.sn || payload.did || body.deviceId || body.deviceSn || body.did || payload.content?.deviceSn || payload.content?.deviceId || payload.content?.did || '';
     
-    // Konversi ID ke Nama Kamera Resmi via DEVICE_MAP
+    // Konversi ID ke Nama Kamera
+    // Prioritaskan nama yang dikirim langsung dari IMOU (seperti dname atau cname), 
+    // jika tidak ada, baru fallback ke DEVICE_MAP yang ada di kode.
     const cname = 
-      DEVICE_MAP[deviceId] || 
-      payload.deviceName || 
+      payload.cname ||
       payload.dname || 
+      payload.deviceName || 
       payload.channelName || 
-      body.deviceName || 
+      body.cname ||
       body.dname || 
+      body.deviceName || 
+      DEVICE_MAP[deviceId] || 
       'CCTV Unknown';
 
     // Deteksi Event Status
@@ -140,6 +145,16 @@ Mohon segera dicek oleh teknisi.`;
 
           const teleRes = await sendTelegramAlert(message);
           if (!teleRes.ok) console.error("Telegram API Error:", await teleRes.json());
+          
+          // Log ke database Neon
+          try {
+            await sql`
+              INSERT INTO notification_logs (device_id, device_name, status)
+              VALUES (${deviceId}, ${cname}, 'offline')
+            `;
+          } catch (dbErr) {
+            console.error("Database Error (Offline Log):", dbErr);
+          }
         }
       }
     } else if (actuallyOnline) {
@@ -157,6 +172,16 @@ CCTV telah beroperasi dan terhubung kembali.`;
 
         const teleRes = await sendTelegramAlert(message);
         if (!teleRes.ok) console.error("Telegram API Error:", await teleRes.json());
+
+        // Log ke database Neon
+        try {
+          await sql`
+            INSERT INTO notification_logs (device_id, device_name, status)
+            VALUES (${deviceId}, ${cname}, 'online')
+          `;
+        } catch (dbErr) {
+          console.error("Database Error (Online Log):", dbErr);
+        }
       } else {
         console.log(`CCTV ${cname} (${deviceId}) sudah online. Abaikan pesan ganda.`);
       }
