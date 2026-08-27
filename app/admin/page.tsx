@@ -3,14 +3,16 @@ import Sidebar from './Sidebar';
 import SyncButton from './SyncButton';
 import Pagination from './Pagination';
 import DatePicker from './DatePicker';
+import SearchBar from './SearchBar';
 
 export const dynamic = 'force-dynamic';
 
-export default async function AdminPanel(props: { searchParams: Promise<{ tab?: string, page?: string, date?: string }> }) {
+export default async function AdminPanel(props: { searchParams: Promise<{ tab?: string, page?: string, date?: string, search?: string }> }) {
   const searchParams = await props.searchParams;
   const tab = searchParams.tab || 'dashboard';
   const currentPage = parseInt(searchParams.page || '1') || 1;
   const filterDate = searchParams.date || null;
+  const searchQuery = searchParams.search || null;
   const itemsPerPage = 30;
   const offset = (currentPage - 1) * itemsPerPage;
 
@@ -61,27 +63,29 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
 
   } else if (tab === 'offline') {
     const dateCondition = filterDate ? sql`AND DATE(created_at AT TIME ZONE 'Asia/Jakarta') = ${filterDate}` : sql``;
+    const searchCondition = searchQuery ? sql`AND device_name ILIKE ${'%' + searchQuery + '%'}` : sql``;
     
-    const countResult = await sql`SELECT COUNT(*) FROM notification_logs WHERE status = 'offline' ${dateCondition}`;
+    const countResult = await sql`SELECT COUNT(*) FROM notification_logs WHERE status = 'offline' ${dateCondition} ${searchCondition}`;
     totalOfflineItems = parseInt(countResult[0].count);
 
     offlineLogs = await sql`
       SELECT id, device_id, device_name, status, created_at
       FROM notification_logs
-      WHERE status = 'offline' ${dateCondition}
+      WHERE status = 'offline' ${dateCondition} ${searchCondition}
       ORDER BY created_at DESC
       LIMIT ${itemsPerPage} OFFSET ${offset}
     `;
   } else if (tab === 'online') {
     const dateCondition = filterDate ? sql`AND DATE(created_at AT TIME ZONE 'Asia/Jakarta') = ${filterDate}` : sql``;
+    const searchCondition = searchQuery ? sql`AND device_name ILIKE ${'%' + searchQuery + '%'}` : sql``;
     
-    const countResult = await sql`SELECT COUNT(*) FROM notification_logs WHERE status = 'online' ${dateCondition}`;
+    const countResult = await sql`SELECT COUNT(*) FROM notification_logs WHERE status = 'online' ${dateCondition} ${searchCondition}`;
     totalOnlineItems = parseInt(countResult[0].count);
 
     onlineLogs = await sql`
       SELECT id, device_id, device_name, status, created_at
       FROM notification_logs
-      WHERE status = 'online' ${dateCondition}
+      WHERE status = 'online' ${dateCondition} ${searchCondition}
       ORDER BY created_at DESC
       LIMIT ${itemsPerPage} OFFSET ${offset}
     `;
@@ -283,7 +287,10 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                       </h2>
                       <p className="text-sm text-slate-500 mt-1">Daftar notifikasi peringatan CCTV mati terbaru.</p>
                     </div>
-                    <DatePicker tab="offline" />
+                    <div className="flex items-center gap-3">
+                      <SearchBar tab="offline" />
+                      <DatePicker tab="offline" />
+                    </div>
                   </div>
                   <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
@@ -343,7 +350,10 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                       </h2>
                       <p className="text-sm text-slate-500 mt-1">Daftar notifikasi pemulihan CCTV terbaru.</p>
                     </div>
-                    <DatePicker tab="online" />
+                    <div className="flex items-center gap-3">
+                      <SearchBar tab="online" />
+                      <DatePicker tab="online" />
+                    </div>
                   </div>
                   <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
