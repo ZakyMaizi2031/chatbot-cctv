@@ -74,12 +74,7 @@ const DEVICE_MAP: Record<string, string> = {
   '8E0250FPAZC7682': '8E0250FPAZC7682-1',
 };
 
-// Menyimpan state terakhir CCTV di memory (gunakan global agar bertahan di Next.js dev)
-const globalAny: any = global;
-if (!globalAny.cctvStates) {
-  globalAny.cctvStates = new Map<string, string>();
-}
-const cctvStates: Map<string, string> = globalAny.cctvStates;
+
 
 export async function POST(req: Request) {
   try {
@@ -204,20 +199,7 @@ CCTV telah beroperasi dan terhubung kembali.`;
   }
 }
 
-// Fungsi Delay / Retry Loop (3x3 Detik)
-async function verifyDeviceOfflineWithRetry(deviceId: string, maxRetries = 3, delayMs = 3000): Promise<boolean> {
-  if (!deviceId) return true; 
 
-  for (let i = 1; i <= maxRetries; i++) {
-    console.log(`[Ping Check ${i}/${maxRetries}] Verifikasi status device ${deviceId}...`);
-    
-    if (i < maxRetries) {
-      await new Promise((resolve) => setTimeout(resolve, delayMs));
-    }
-  }
-
-  return true;
-}
 
 // Fungsi Kirim Pesan ke Telegram
 async function sendTelegramAlert(text: string) {
