@@ -69,77 +69,7 @@ async function checkDeviceStatus(token: string, deviceId: string): Promise<'onli
 }
 
 // Mapping Serial Number dari Console Imou ke Nama Perangkat
-const DEVICE_MAP: Record<string, string> = {
-  '9010BBLPSF211B0': 'Lorong Marketing',
-  'E7ECDBLPSF8CC59': 'Lorong Operasional',
-  '8E0250FPAZBD5F5': '8E0250FPAZBD5F5-1',
-  '914DEAMPSFC43FB': 'P2 Resilient',
-  '7272FBEPBVE4AC2': 'Lorong',
-  '914DEAMPSF081CB': 'Teacher Room',
-  'B43BACCPSF6B60B': 'K1 Odyssesy',
-  'B43BACCPSF3CCB7': 'K1 Sparkle',
-  'F3320AMPCG09E5B': 'Mezanine',
-  'E7ECDBLPSF35527': 'Library',
-  'F3320AMPCG14E18': 'Tangga LT3',
-  'F3320AMPCG72BE8': 'Lorong LT2 Panel',
-  'F3320AMPCG2E490': 'Aula lt1',
-  'F3320AMPCG55E0D': 'lorong lt1',
-  'F3320AMPCGB3D14': 'Lobi 2',
-  'F3320AMPCG64E39': 'Sick Bay',
-  'F3320AMPCG8F1A1': 'Teacher Room',
-  'F3320AMPCG4B11B': 'Studenthub',
-  'F3320AMPCG814C3': 'Science Laboratory',
-  'F3320AMPCG657F3': 'Counseling Room',
-  'F3320AMPCG1F94C': 'Grade 7',
-  'F3320AMPCG438FC': 'Lobi utama',
-  'F3320AMPCG42423': 'Physics Laboratory',
-  'F3320AMPCG5D79D': 'Meeting Room',
-  'F3320AMPCGD51F8': 'Grade 7 (2)',
-  'F3320AMPCG9B725': 'Tangga ke LT1',
-  '66F82BCPCG71606': 'Ruang meeting lt 3',
-  '66F82BCPCG71755': 'Auditorium lt2 1',
-  'F3320AMPCGF73EC': 'LT2 kelas 2',
-  '66F82BCPCG2F44B': 'LT2 kelas 1',
-  '679E7AKPCG9E8DA': 'Auditorium lt2 2',
-  'F3320AMPCG29126': 'Mushola lt2',
-  'F3320AMPCG18732': 'Ruang guru lt2',
-  'F3320AMPCGBD93A': 'LT2 kelas 4',
-  '679E7AKPCG2DDCC': 'LT2 kelas 3',
-  '66F82BCPCG4DFA2': 'Auditorium lt2 3',
-  'F3320AMPCG9CF1E': 'Computer Lab',
-  'F3320AMPCGBBB9A': 'Lorong lt2',
-  '17903AKPSFFE56F': 'P1 Courageous',
-  '17903AKPSF86A23': 'P1 Curious',
-  '914DEAMPSFCB7D8': 'P1 Generous',
-  '17903AKPSFFCDF6': 'P1 Adventurous',
-  '914DEAMPSF05581': 'Library',
-  '914DEAMPSF84EAB': 'P2 Empathetic',
-  '914DEAMPSFDAB20': 'P1 Integrity',
-  '17903AKPSF7AC8F': 'Lorong sisi 1',
-  '8E0250FPAZ32D89': '8E0250FPAZ32D89-1',
-  '8E0250FPAZC56A9': '8E0250FPAZC56A9-1',
-  '8E0250FPAZ9A4F5': '8E0250FPAZ9A4F5-1',
-  '8E0250FPAZ76CFA': '8E0250FPAZ76CFA-1',
-  '8E0250FPAZ69908': '8E0250FPAZ69908-1',
-  '8E0250FPAZF3988': '8E0250FPAZF3988-1',
-  '8E0250FPAZ5D42F': '8E0250FPAZ5D42F-1',
-  '8E0250FPAZA013B': '8E0250FPAZA013B-1',
-  '8E0250FPAZ9B5DB': '8E0250FPAZ9B5DB-1',
-  '8E0250FPAZ4C6EC': '8E0250FPAZ4C6EC-1',
-  '8E0250FPAZC6AA1': '8E0250FPAZC6AA1-1',
-  '8E0250FPAZ58A75': '8E0250FPAZ58A75-1',
-  '8E0250FPAZ5AC03': '8E0250FPAZ5AC03-1',
-  '8E0250FPAZDACAD': '8E0250FPAZDACAD-1',
-  '8E0250FPAZ59CBA': '8E0250FPAZ59CBA-1',
-  '8E0250FPAZC50A0': '8E0250FPAZC50A0-1',
-  '8E0250FPAZE8EF5': '8E0250FPAZE8EF5-1',
-  '8E0250FPAZ469DB': '8E0250FPAZ469DB-1',
-  '8E0250FPAZ9B161': '8E0250FPAZ9B161-1',
-  '8E0250FPAZF6048': '8E0250FPAZF6048-1',
-  '8E0250FPAZ4DBFE': '8E0250FPAZ4DBFE-1',
-  '8E0250FPAZ468AC': '8E0250FPAZ468AC-1',
-  '8E0250FPAZC7682': '8E0250FPAZC7682-1',
-};
+const DEVICE_MAP: Record<string, string> = {};
 
 
 
@@ -156,9 +86,23 @@ export async function POST(req: Request) {
     // Ambil ID/Serial Number dari payload Imou
     const deviceId = payload.deviceId || payload.deviceSn || payload.sn || payload.did || body.deviceId || body.deviceSn || body.did || payload.content?.deviceSn || payload.content?.deviceId || payload.content?.did || '';
     
+    // Ambil status dan nama terakhir dari database
+    let currentState = 'online'; // default
+    let dbDeviceName = '';
+    try {
+      const dbResult = await sql`
+        SELECT status, device_name FROM devices WHERE device_id = ${deviceId} LIMIT 1
+      `;
+      if (dbResult.length > 0) {
+        currentState = dbResult[0].status;
+        dbDeviceName = dbResult[0].device_name;
+      }
+    } catch (e) {
+      console.error("Gagal mengambil status dari DB", e);
+    }
+
     // Konversi ID ke Nama Kamera
-    // Prioritaskan nama yang dikirim langsung dari IMOU (seperti dname atau cname), 
-    // jika tidak ada, baru fallback ke DEVICE_MAP yang ada di kode.
+    // Prioritaskan nama dari IMOU webhook, jika tidak ada, ambil dari database
     const cname = 
       payload.cname ||
       payload.dname || 
@@ -167,7 +111,7 @@ export async function POST(req: Request) {
       body.cname ||
       body.dname || 
       body.deviceName || 
-      DEVICE_MAP[deviceId] || 
+      dbDeviceName || 
       'CCTV Unknown';
 
     // Deteksi Event Status
@@ -178,19 +122,6 @@ export async function POST(req: Request) {
     const isStatusUpdate = type.includes('devicestatus');
     const actuallyOffline = isOfflineEvent || (isStatusUpdate && (status === 'offline' || status === '0'));
     const actuallyOnline = isOnlineEvent || (isStatusUpdate && (status === 'online' || status === '1'));
-
-    // Ambil status terakhir dari database (karena Vercel serverless tidak menyimpan memory)
-    let currentState = 'online'; // default
-    try {
-      const dbResult = await sql`
-        SELECT status FROM devices WHERE device_id = ${deviceId} LIMIT 1
-      `;
-      if (dbResult.length > 0) {
-        currentState = dbResult[0].status;
-      }
-    } catch (e) {
-      console.error("Gagal mengambil status dari DB", e);
-    }
 
     const currentTime = new Date().toLocaleString('id-ID', {
       dateStyle: 'medium',
