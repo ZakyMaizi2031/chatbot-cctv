@@ -228,7 +228,7 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                               <div className={`absolute -left-[9px] top-1 w-4 h-4 rounded-full border-2 border-white shadow-sm ${isOnline ? 'bg-emerald-500' : 'bg-red-500'}`}></div>
                               <div className="flex flex-col">
                                 <span className="text-xs font-semibold text-slate-400">
-                                  {new Date(log.created_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })} WIB
+                                  {new Date(log.created_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Jakarta' })} WIB
                                 </span>
                                 <span className="font-bold text-slate-800 mt-1 leading-snug">
                                   {log.device_name}
@@ -279,8 +279,8 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                         {offlineLogs.map((log) => (
                           <tr key={log.id} className="hover:bg-red-50/50 transition-colors group">
                             <td className="p-5 whitespace-nowrap">
-                              <div className="text-slate-700 font-medium">{new Date(log.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
-                              <div className="text-slate-400 text-xs mt-0.5">{new Date(log.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB</div>
+                              <div className="text-slate-700 font-medium">{new Date(log.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })}</div>
+                              <div className="text-slate-400 text-xs mt-0.5">{new Date(log.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })} WIB</div>
                             </td>
                             <td className="p-5">
                               <div className="font-semibold text-slate-800">{log.device_name}</div>
@@ -331,8 +331,8 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                         {onlineLogs.map((log) => (
                           <tr key={log.id} className="hover:bg-emerald-50/50 transition-colors group">
                             <td className="p-5 whitespace-nowrap">
-                              <div className="text-slate-700 font-medium">{new Date(log.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
-                              <div className="text-slate-400 text-xs mt-0.5">{new Date(log.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB</div>
+                              <div className="text-slate-700 font-medium">{new Date(log.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })}</div>
+                              <div className="text-slate-400 text-xs mt-0.5">{new Date(log.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })} WIB</div>
                             </td>
                             <td className="p-5">
                               <div className="font-semibold text-slate-800">{log.device_name}</div>
@@ -405,7 +405,7 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                                 </span>
                               </td>
                               <td className="p-5 text-xs text-slate-500 font-medium">
-                                {new Date(dev.last_synced_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })}
+                                {new Date(dev.last_synced_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Jakarta' })}
                               </td>
                             </tr>
                           );
