@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 
 export default function Pagination({ 
   currentPage, 
@@ -13,10 +14,20 @@ export default function Pagination({
   itemsPerPage: number, 
   tab: string 
 }) {
+  const searchParams = useSearchParams();
+  
   if (totalItems === 0) return null;
 
   const startItem = (currentPage - 1) * itemsPerPage + 1;
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
+
+  // Helper to build URL with existing search params
+  const buildPageUrl = (page: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('tab', tab);
+    params.set('page', page.toString());
+    return `?${params.toString()}`;
+  };
 
   return (
     <div className="flex items-center justify-between border-t border-slate-100 bg-white px-6 py-4 rounded-b-2xl">
@@ -26,7 +37,7 @@ export default function Pagination({
       <div className="flex items-center gap-2">
         {currentPage > 1 ? (
           <Link 
-            href={`?tab=${tab}&page=${currentPage - 1}`}
+            href={buildPageUrl(currentPage - 1)}
             className="p-2 rounded-lg text-slate-500 hover:bg-slate-100 transition-colors"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -47,7 +58,7 @@ export default function Pagination({
 
         {currentPage < totalPages ? (
           <Link 
-            href={`?tab=${tab}&page=${currentPage + 1}`}
+            href={buildPageUrl(currentPage + 1)}
             className="p-2 rounded-lg text-slate-500 hover:bg-slate-100 transition-colors"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
