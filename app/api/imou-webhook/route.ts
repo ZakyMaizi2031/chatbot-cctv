@@ -1,5 +1,72 @@
 import { NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
+import crypto from 'crypto';
+
+// Base URL IMOU Open API
+const IMOU_BASE_URL = 'https://openapi-sg.easy4ip.com/openapi';
+const APP_ID = (process.env.IMOU_APP_ID || '').trim();
+const APP_SECRET = (process.env.IMOU_APP_SECRET || '').trim();
+
+// === Helper: Buat system header + signature IMOU ===
+function buildRequestBody(params: Record<string, unknown> = {}) {
+  const time = Math.floor(Date.now() / 1000);
+  const nonce = crypto.randomUUID().replace(/-/g, '').substring(0, 8);
+  const signRaw = `time:${time},nonce:${nonce},appSecret:${APP_SECRET}`;
+  const sign = crypto.createHash('md5').update(signRaw).digest('hex');
+
+  return {
+    system: { ver: '1.0', appId: APP_ID, time, nonce, sign },
+    params,
+    id: crypto.randomUUID(),
+  };
+}
+
+// === Helper: Ambil Access Token IMOU ===
+async function getAccessToken(): Promise<string> {
+  if (!APP_ID || !APP_SECRET) return '';
+  try {
+    const body = buildRequestBody({});
+    const res = await fetch(`${IMOU_BASE_URL}/accessToken`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(5000),
+    });
+    const json = await res.json();
+    return json.result?.data?.accessToken || '';
+  } catch (error) {
+    console.error("Gagal mendapatkan Access Token IMOU:", error);
+    return '';
+  }
+}
+
+// === Helper: Cek Status Realtime Device ===
+async function checkDeviceStatus(token: string, deviceId: string): Promise<'online'|'offline'|'unknown'> {
+  try {
+    const body = buildRequestBody({ token, deviceId });
+    const res = await fetch(`${IMOU_BASE_URL}/deviceBaseDetail`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(5000),
+    });
+    const json = await res.json();
+    if (json.result?.code !== '0') return 'unknown';
+    
+    const d = json.result?.data;
+    if (!d) return 'unknown';
+
+    const isOnline = 
+      d.deviceStatus === 'online' || d.deviceStatus === 1 || 
+      d.status === 'online' || d.status === 1 || d.status === '1' || 
+      d.onLine === 1 || d.onLine === '1' || d.online === true;
+      
+    return isOnline ? 'online' : 'offline';
+  } catch (error) {
+    console.error(`Gagal ngeping status device ${deviceId}:`, error);
+    return 'unknown';
+  }
+}
 
 // Mapping Serial Number dari Console Imou ke Nama Perangkat
 const DEVICE_MAP: Record<string, string> = {
@@ -135,8 +202,39 @@ export async function POST(req: Request) {
       if (currentState === 'offline') {
         console.log(`CCTV ${cname} (${deviceId}) sudah offline sebelumnya. Abaikan pesan ganda.`);
       } else {
-        // Langsung kirim notifikasi offline tanpa ditunda, agar tidak bertabrakan jika CCTV langsung online lagi dalam 2 detik
-        const message = 
+        console.log(`Mendeteksi CCTV ${cname} offline, memulai proses ping verifikasi (3x, jeda 2s)...`);
+        
+        let isConfirmedOffline = false;
+        try {
+          const token = await getAccessToken();
+          if (token) {
+            let finalStatus = 'offline';
+            for (let i = 1; i <= 3; i++) {
+              // Tunggu 2 detik
+              await new Promise(resolve => setTimeout(resolve, 2000));
+              
+              const currentStatus = await checkDeviceStatus(token, deviceId);
+              console.log(`Ping ${i} untuk ${cname}: status = ${currentStatus}`);
+              
+              if (currentStatus === 'online') {
+                finalStatus = 'online';
+                console.log(`Batal kirim notifikasi mati: CCTV ${cname} ternyata sudah online di ping ke-${i}`);
+                break;
+              }
+            }
+            isConfirmedOffline = (finalStatus === 'offline');
+          } else {
+            // Fallback: Jika gagal dapat token, anggap offline saja
+            console.log("Token IMOU gagal didapat, fallback anggap offline.");
+            isConfirmedOffline = true;
+          }
+        } catch (pingErr) {
+          console.error("Gagal melakukan ping ke IMOU API:", pingErr);
+          isConfirmedOffline = true; // Fallback
+        }
+
+        if (isConfirmedOffline) {
+          const message = 
 `<b>⚠️ CCTV TIDAK BERFUNGSI</b>
 
 📷 Device: <b>${cname}</b>
@@ -145,20 +243,21 @@ export async function POST(req: Request) {
 
 Mohon segera dicek oleh teknisi.`;
 
-        const teleRes = await sendTelegramAlert(message);
-        if (!teleRes.ok) console.error("Telegram API Error:", await teleRes.json());
-        
-        // Log ke database Neon dan update tabel devices
-        try {
-          await sql`
-            INSERT INTO notification_logs (device_id, device_name, status)
-            VALUES (${deviceId}, ${cname}, 'offline')
-          `;
-          await sql`
-            UPDATE devices SET status = 'offline' WHERE device_id = ${deviceId}
-          `;
-        } catch (dbErr) {
-          console.error("Database Error (Offline Log):", dbErr);
+          const teleRes = await sendTelegramAlert(message);
+          if (!teleRes.ok) console.error("Telegram API Error:", await teleRes.json());
+          
+          // Log ke database Neon dan update tabel devices
+          try {
+            await sql`
+              INSERT INTO notification_logs (device_id, device_name, status)
+              VALUES (${deviceId}, ${cname}, 'offline')
+            `;
+            await sql`
+              UPDATE devices SET status = 'offline' WHERE device_id = ${deviceId}
+            `;
+          } catch (dbErr) {
+            console.error("Database Error (Offline Log):", dbErr);
+          }
         }
       }
     } else if (actuallyOnline) {
