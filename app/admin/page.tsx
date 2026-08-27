@@ -1,12 +1,16 @@
 import { sql } from '@/lib/db';
 import Sidebar from './Sidebar';
 import SyncButton from './SyncButton';
+import Pagination from './Pagination';
 
 export const dynamic = 'force-dynamic';
 
-export default async function AdminPanel(props: { searchParams: Promise<{ tab?: string }> }) {
+export default async function AdminPanel(props: { searchParams: Promise<{ tab?: string, page?: string }> }) {
   const searchParams = await props.searchParams;
   const tab = searchParams.tab || 'dashboard';
+  const currentPage = parseInt(searchParams.page || '1') || 1;
+  const itemsPerPage = 30;
+  const offset = (currentPage - 1) * itemsPerPage;
 
   // State Variables
   let offlineLogs: any[] = [];
@@ -19,6 +23,8 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
   let onlineCount = 0;
   let offlineCount = 0;
   let recentLogs: any[] = [];
+  let totalOfflineItems = 0;
+  let totalOnlineItems = 0;
 
   // Fetch only what's needed for the active tab
   if (tab === 'dashboard') {
@@ -52,20 +58,26 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
     `;
 
   } else if (tab === 'offline') {
+    const countResult = await sql`SELECT COUNT(*) FROM notification_logs WHERE status = 'offline'`;
+    totalOfflineItems = parseInt(countResult[0].count);
+
     offlineLogs = await sql`
       SELECT id, device_id, device_name, status, created_at
       FROM notification_logs
       WHERE status = 'offline'
       ORDER BY created_at DESC
-      LIMIT 100
+      LIMIT ${itemsPerPage} OFFSET ${offset}
     `;
   } else if (tab === 'online') {
+    const countResult = await sql`SELECT COUNT(*) FROM notification_logs WHERE status = 'online'`;
+    totalOnlineItems = parseInt(countResult[0].count);
+
     onlineLogs = await sql`
       SELECT id, device_id, device_name, status, created_at
       FROM notification_logs
       WHERE status = 'online'
       ORDER BY created_at DESC
-      LIMIT 100
+      LIMIT ${itemsPerPage} OFFSET ${offset}
     `;
   } else if (tab === 'devices') {
     devices = await sql`
@@ -301,6 +313,13 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                       </tbody>
                     </table>
                   </div>
+                  <Pagination 
+                    currentPage={currentPage}
+                    totalPages={Math.ceil(totalOfflineItems / itemsPerPage) || 1}
+                    totalItems={totalOfflineItems}
+                    itemsPerPage={itemsPerPage}
+                    tab="offline"
+                  />
                 </div>
               </div>
             )}
@@ -353,6 +372,13 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                       </tbody>
                     </table>
                   </div>
+                  <Pagination 
+                    currentPage={currentPage}
+                    totalPages={Math.ceil(totalOnlineItems / itemsPerPage) || 1}
+                    totalItems={totalOnlineItems}
+                    itemsPerPage={itemsPerPage}
+                    tab="online"
+                  />
                 </div>
               </div>
             )}
