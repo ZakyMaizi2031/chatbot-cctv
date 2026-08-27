@@ -1,7 +1,6 @@
 import { sql } from '@/lib/db';
 import Sidebar from './Sidebar';
 import SyncButton from './SyncButton';
-import DashboardCharts from './DashboardCharts';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,7 +19,6 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
   let onlineCount = 0;
   let offlineCount = 0;
   let recentLogs: any[] = [];
-  let trendData: any[] = [];
 
   // Fetch only what's needed for the active tab
   if (tab === 'dashboard') {
@@ -52,22 +50,6 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
       ORDER BY created_at DESC
       LIMIT 6
     `;
-
-    // Get 7-day trend for offline events
-    const rawTrend = await sql`
-      SELECT 
-        TO_CHAR(created_at AT TIME ZONE 'Asia/Jakarta', 'DD Mon') as date, 
-        COUNT(*) as count 
-      FROM notification_logs 
-      WHERE status = 'offline' 
-        AND created_at >= NOW() - INTERVAL '7 days'
-      GROUP BY DATE(created_at AT TIME ZONE 'Asia/Jakarta'), TO_CHAR(created_at AT TIME ZONE 'Asia/Jakarta', 'DD Mon')
-      ORDER BY DATE(created_at AT TIME ZONE 'Asia/Jakarta') ASC
-    `;
-    trendData = rawTrend.map((row: any) => ({
-      date: row.date,
-      count: parseInt(row.count)
-    }));
 
   } else if (tab === 'offline') {
     offlineLogs = await sql`
@@ -182,12 +164,6 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                     </div>
                   </div>
                 </div>
-
-                <DashboardCharts 
-                  trendData={trendData} 
-                  onlineCount={onlineCount} 
-                  offlineCount={offlineCount} 
-                />
 
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
                   {/* Section 2: Frekuensi Kerusakan */}
