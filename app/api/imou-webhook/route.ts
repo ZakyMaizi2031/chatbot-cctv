@@ -121,7 +121,7 @@ export async function POST(req: Request) {
     let currentState = 'online'; // default
     try {
       const dbResult = await sql`
-        SELECT status FROM devices WHERE id = ${deviceId} LIMIT 1
+        SELECT status FROM devices WHERE device_id = ${deviceId} LIMIT 1
       `;
       if (dbResult.length > 0) {
         currentState = dbResult[0].status;
@@ -140,11 +140,8 @@ export async function POST(req: Request) {
       if (currentState === 'offline') {
         console.log(`CCTV ${cname} (${deviceId}) sudah offline sebelumnya. Abaikan pesan ganda.`);
       } else {
-        // Lakukan Ping Verifikasi 3 kali (Jeda 3 detik per ping)
-        const isConfirmedOffline = await verifyDeviceOfflineWithRetry(deviceId, 3, 3000);
-
-        if (isConfirmedOffline) {
-          const message = 
+        // Langsung kirim notifikasi offline tanpa ditunda, agar tidak bertabrakan jika CCTV langsung online lagi dalam 2 detik
+        const message = 
 `<b>⚠️ CCTV TIDAK BERFUNGSI</b>
 
 📷 Device: <b>${cname}</b>
@@ -153,21 +150,20 @@ export async function POST(req: Request) {
 
 Mohon segera dicek oleh teknisi.`;
 
-          const teleRes = await sendTelegramAlert(message);
-          if (!teleRes.ok) console.error("Telegram API Error:", await teleRes.json());
-          
-          // Log ke database Neon dan update tabel devices
-          try {
-            await sql`
-              INSERT INTO notification_logs (device_id, device_name, status)
-              VALUES (${deviceId}, ${cname}, 'offline')
-            `;
-            await sql`
-              UPDATE devices SET status = 'offline' WHERE id = ${deviceId}
-            `;
-          } catch (dbErr) {
-            console.error("Database Error (Offline Log):", dbErr);
-          }
+        const teleRes = await sendTelegramAlert(message);
+        if (!teleRes.ok) console.error("Telegram API Error:", await teleRes.json());
+        
+        // Log ke database Neon dan update tabel devices
+        try {
+          await sql`
+            INSERT INTO notification_logs (device_id, device_name, status)
+            VALUES (${deviceId}, ${cname}, 'offline')
+          `;
+          await sql`
+            UPDATE devices SET status = 'offline' WHERE device_id = ${deviceId}
+          `;
+        } catch (dbErr) {
+          console.error("Database Error (Offline Log):", dbErr);
         }
       }
     } else if (actuallyOnline) {
@@ -191,7 +187,7 @@ CCTV telah beroperasi dan terhubung kembali.`;
             VALUES (${deviceId}, ${cname}, 'online')
           `;
           await sql`
-            UPDATE devices SET status = 'online' WHERE id = ${deviceId}
+            UPDATE devices SET status = 'online' WHERE device_id = ${deviceId}
           `;
         } catch (dbErr) {
           console.error("Database Error (Online Log):", dbErr);
