@@ -117,7 +117,19 @@ export async function POST(req: Request) {
     const actuallyOffline = isOfflineEvent || (isStatusUpdate && (status === 'offline' || status === '0'));
     const actuallyOnline = isOnlineEvent || (isStatusUpdate && (status === 'online' || status === '1'));
 
-    const currentState = cctvStates.get(deviceId) || 'online'; // Anggap online by default
+    // Ambil status terakhir dari database (karena Vercel serverless tidak menyimpan memory)
+    let currentState = 'online'; // default
+    try {
+      const dbResult = await sql`
+        SELECT status FROM devices WHERE id = ${deviceId} LIMIT 1
+      `;
+      if (dbResult.length > 0) {
+        currentState = dbResult[0].status;
+      }
+    } catch (e) {
+      console.error("Gagal mengambil status dari DB", e);
+    }
+
     const currentTime = new Date().toLocaleString('id-ID', {
       dateStyle: 'medium',
       timeStyle: 'short',
@@ -132,8 +144,6 @@ export async function POST(req: Request) {
         const isConfirmedOffline = await verifyDeviceOfflineWithRetry(deviceId, 3, 3000);
 
         if (isConfirmedOffline) {
-          cctvStates.set(deviceId, 'offline'); // Update status
-
           const message = 
 `<b>⚠️ CCTV TIDAK BERFUNGSI</b>
 
@@ -146,11 +156,14 @@ Mohon segera dicek oleh teknisi.`;
           const teleRes = await sendTelegramAlert(message);
           if (!teleRes.ok) console.error("Telegram API Error:", await teleRes.json());
           
-          // Log ke database Neon
+          // Log ke database Neon dan update tabel devices
           try {
             await sql`
               INSERT INTO notification_logs (device_id, device_name, status)
               VALUES (${deviceId}, ${cname}, 'offline')
+            `;
+            await sql`
+              UPDATE devices SET status = 'offline' WHERE id = ${deviceId}
             `;
           } catch (dbErr) {
             console.error("Database Error (Offline Log):", dbErr);
@@ -159,8 +172,6 @@ Mohon segera dicek oleh teknisi.`;
       }
     } else if (actuallyOnline) {
       if (currentState === 'offline') {
-        cctvStates.set(deviceId, 'online'); // Update status kembali online
-
         const message = 
 `<b>✅ CCTV KEMBALI NORMAL</b>
 
@@ -173,11 +184,14 @@ CCTV telah beroperasi dan terhubung kembali.`;
         const teleRes = await sendTelegramAlert(message);
         if (!teleRes.ok) console.error("Telegram API Error:", await teleRes.json());
 
-        // Log ke database Neon
+        // Log ke database Neon dan update tabel devices
         try {
           await sql`
             INSERT INTO notification_logs (device_id, device_name, status)
             VALUES (${deviceId}, ${cname}, 'online')
+          `;
+          await sql`
+            UPDATE devices SET status = 'online' WHERE id = ${deviceId}
           `;
         } catch (dbErr) {
           console.error("Database Error (Online Log):", dbErr);
