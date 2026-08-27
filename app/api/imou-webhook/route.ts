@@ -79,9 +79,11 @@ export async function POST(req: Request) {
     console.log("Payload Imou Masuk:", JSON.stringify(body, null, 2));
 
     const payload = body.data || body.params || body;
+    console.log("INCOMING WEBHOOK PAYLOAD:", JSON.stringify(payload));
     
     const status = (payload.status || body.status || payload.content?.status || '').toString().toLowerCase();
-    const type = (payload.type || body.type || body.msgType || payload.content?.type || '').toString().toLowerCase();
+    const type = (payload.type || body.type || payload.content?.type || '').toString().toLowerCase();
+    const msgType = (payload.msgType || body.msgType || '').toString().toLowerCase();
 
     // Ambil ID/Serial Number dari payload Imou
     const deviceId = payload.deviceId || payload.deviceSn || payload.sn || payload.did || body.deviceId || body.deviceSn || body.did || payload.content?.deviceSn || payload.content?.deviceId || payload.content?.did || '';
@@ -115,8 +117,8 @@ export async function POST(req: Request) {
       'CCTV Unknown';
 
     // Deteksi Event Status
-    const isOfflineEvent = status === 'offline' || status === '0' || type.includes('offline');
-    const isOnlineEvent = status === 'online' || status === '1' || type.includes('online');
+    const isOfflineEvent = status === 'offline' || status === '0' || type.includes('offline') || msgType.includes('offline');
+    const isOnlineEvent = status === 'online' || status === '1' || type.includes('online') || msgType.includes('online');
     
     // Jika event berupa 'devicestatus' tapi tidak jelas statusnya, fallback berdasarkan field status jika ada
     const isStatusUpdate = type.includes('devicestatus');
