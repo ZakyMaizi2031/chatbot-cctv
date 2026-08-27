@@ -197,7 +197,16 @@ Mohon segera dicek oleh teknisi.`;
       if (currentState === 'online') {
         console.log(`CCTV ${cname} (${deviceId}) sudah online sebelumnya. Abaikan pesan ganda.`);
       } else {
-        const message = 
+        try {
+          // Gunakan UPDATE sebagai Atomic Lock untuk mencegah Race Condition webhook ganda
+          const updateResult = await sql`
+            UPDATE devices SET status = 'online' WHERE device_id = ${deviceId} AND status = 'offline' RETURNING device_id
+          `;
+          
+          if (updateResult.length === 0) {
+            console.log(`[Race Condition] CCTV ${cname} sudah di-update online oleh proses lain.`);
+          } else {
+            const message = 
 `<b>✅ CCTV KEMBALI NORMAL</b>
 
 📷 Device: <b>${cname}</b>
@@ -206,20 +215,15 @@ Mohon segera dicek oleh teknisi.`;
 
 CCTV telah beroperasi dan terhubung kembali.`;
 
-        const teleRes = await sendTelegramAlert(message);
-        if (!teleRes.ok) console.error("Telegram API Error:", await teleRes.json());
-        else console.log(`Berhasil kirim notifikasi ONLINE ke Telegram untuk ${cname}`);
+            const teleRes = await sendTelegramAlert(message);
+            if (!teleRes.ok) console.error("Telegram API Error:", await teleRes.json());
+            else console.log(`Berhasil kirim notifikasi ONLINE ke Telegram untuk ${cname}`);
 
-        // Update database
-        try {
-          await sql`
-            INSERT INTO notification_logs (device_id, device_name, status)
-            VALUES (${deviceId}, ${cname}, 'online')
-          `;
-          
-          await sql`
-            UPDATE devices SET status = 'online' WHERE device_id = ${deviceId}
-          `;
+            await sql`
+              INSERT INTO notification_logs (device_id, device_name, status)
+              VALUES (${deviceId}, ${cname}, 'online')
+            `;
+          }
         } catch (dbErr) {
           console.error("Database Error (Online Log):", dbErr);
         }
