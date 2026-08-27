@@ -6,7 +6,7 @@ import DatePicker from './DatePicker';
 
 export const dynamic = 'force-dynamic';
 
-export default async function AdminPanel(props: { searchParams: Promise<{ tab?: string, page?: string }> }) {
+export default async function AdminPanel(props: { searchParams: Promise<{ tab?: string, page?: string, date?: string }> }) {
   const searchParams = await props.searchParams;
   const tab = searchParams.tab || 'dashboard';
   const currentPage = parseInt(searchParams.page || '1') || 1;
