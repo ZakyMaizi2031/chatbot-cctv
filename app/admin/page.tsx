@@ -57,7 +57,7 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
       FROM notification_logs
       WHERE status = 'offline'
       ORDER BY created_at DESC
-      LIMIT 30
+      LIMIT 100
     `;
   } else if (tab === 'online') {
     onlineLogs = await sql`
@@ -65,7 +65,7 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
       FROM notification_logs
       WHERE status = 'online'
       ORDER BY created_at DESC
-      LIMIT 30
+      LIMIT 100
     `;
   } else if (tab === 'devices') {
     devices = await sql`
