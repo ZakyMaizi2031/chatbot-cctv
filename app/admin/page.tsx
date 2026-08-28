@@ -287,7 +287,7 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                       </h2>
                       <p className="text-sm text-slate-500 mt-1">Daftar notifikasi peringatan CCTV mati terbaru.</p>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                       <SearchBar tab="offline" />
                       <DatePicker tab="offline" />
                     </div>
@@ -350,7 +350,7 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                       </h2>
                       <p className="text-sm text-slate-500 mt-1">Daftar notifikasi pemulihan CCTV terbaru.</p>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                       <SearchBar tab="online" />
                       <DatePicker tab="online" />
                     </div>

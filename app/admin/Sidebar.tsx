@@ -65,11 +65,13 @@ export default function Sidebar({ currentTab }: { currentTab: string }) {
   ];
 
   return (
-    <aside 
-      className={`bg-white border-r border-slate-200 flex flex-col transition-all duration-300 ease-in-out sticky top-0 h-screen flex-shrink-0 z-40 ${
-        collapsed ? 'w-20' : 'w-64'
-      }`}
-    >
+    <>
+      {/* --- DESKTOP SIDEBAR --- */}
+      <aside 
+        className={`hidden md:flex bg-white border-r border-slate-200 flex-col transition-all duration-300 ease-in-out sticky top-0 h-screen flex-shrink-0 z-40 ${
+          collapsed ? 'w-20' : 'w-64'
+        }`}
+      >
       {/* Header Logo */}
       <div className="h-[73px] flex items-center justify-between px-4 border-b border-slate-200 flex-shrink-0">
         <div className={`flex items-center gap-3 overflow-hidden transition-opacity duration-300 ${collapsed ? 'opacity-0 w-0' : 'opacity-100'}`}>
@@ -143,6 +145,35 @@ export default function Sidebar({ currentTab }: { currentTab: string }) {
           <span className="text-xs font-semibold text-emerald-700 truncate">System Online</span>
         </div>
       </div>
-    </aside>
+      </aside>
+
+      {/* --- MOBILE BOTTOM NAVIGATION --- */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-[0_-4px_15px_-5px_rgba(0,0,0,0.05)] z-50 flex items-center justify-around px-2 h-16 pb-safe">
+        {links.map((link) => {
+          const isActive = currentTab === link.id;
+          return (
+            <Link
+              key={link.id}
+              href={`?tab=${link.id}`}
+              className={`flex flex-col items-center justify-center w-full h-full gap-1 transition-colors ${
+                isActive ? 'text-blue-600' : 'text-slate-400 hover:text-slate-600'
+              }`}
+            >
+              <div className={`p-1.5 rounded-full transition-all duration-300 ${
+                isActive ? 'bg-blue-50' : 'bg-transparent'
+              }`}>
+                {/* Clone the icon to make it slightly smaller on mobile if needed, but h-5 w-5 is fine */}
+                {link.icon}
+              </div>
+              <span className={`text-[10px] font-medium leading-none ${
+                isActive ? 'font-bold' : ''
+              }`}>
+                {link.label}
+              </span>
+            </Link>
+          );
+        })}
+      </nav>
+    </>
   );
 }
