@@ -107,23 +107,23 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
       <div className="flex-1 flex flex-col min-w-0">
         
         {/* Header / Navbar Atas */}
-        <header className="bg-white/80 backdrop-blur-md sticky top-0 z-30 border-b border-slate-200 shadow-sm h-[73px] flex items-center px-8 flex-shrink-0">
-          <div className="flex-1 flex items-center gap-3">
-            <div>
-              <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-800 to-slate-500">
+        <header className="bg-white/80 backdrop-blur-md sticky top-0 z-30 border-b border-slate-200 shadow-sm h-[73px] flex items-center justify-between px-4 sm:px-8 flex-shrink-0">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="truncate">
+              <h1 className="text-base sm:text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-800 to-slate-500 truncate">
                 Kreativa CCTV Center
               </h1>
-              <p className="text-xs text-slate-500 font-medium">System Monitoring Dashboard</p>
+              <p className="text-[10px] sm:text-xs text-slate-500 font-medium truncate">System Monitoring Dashboard</p>
             </div>
           </div>
           
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 bg-emerald-50 px-4 py-2 rounded-full border border-emerald-100 shadow-sm">
-              <span className="relative flex h-3 w-3">
+          <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0 ml-2">
+            <div className="flex items-center gap-1.5 sm:gap-2 bg-emerald-50 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full border border-emerald-100 shadow-sm">
+              <span className="relative flex h-2 sm:h-3 w-2 sm:w-3">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                <span className="relative inline-flex rounded-full h-2 sm:h-3 w-2 sm:w-3 bg-emerald-500"></span>
               </span>
-              <span className="text-sm font-semibold text-emerald-700">System Online</span>
+              <span className="text-[10px] sm:text-sm font-semibold text-emerald-700 whitespace-nowrap">System Online</span>
             </div>
           </div>
         </header>
