@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import crypto from 'crypto';
 
+export const maxDuration = 60; // Allow maximum 60 seconds execution time on Vercel Hobby
+
 // Base URL IMOU Open API
 const IMOU_BASE_URL = 'https://openapi-sg.easy4ip.com/openapi';
 const APP_ID = (process.env.IMOU_APP_ID || '').trim();
@@ -135,7 +137,7 @@ export async function POST(req: Request) {
       if (currentState === 'offline') {
         console.log(`CCTV ${cname} (${deviceId}) sudah offline sebelumnya. Abaikan pesan ganda.`);
       } else {
-        console.log(`Mendeteksi CCTV ${cname} offline, memulai proses ping verifikasi (3x, jeda 2s)...`);
+        console.log(`Mendeteksi CCTV ${cname} offline, memulai proses ping verifikasi (3x, jeda 15s)...`);
         
         let isConfirmedOffline = false;
         try {
@@ -143,8 +145,8 @@ export async function POST(req: Request) {
           if (token) {
             let finalStatus = 'offline';
             for (let i = 1; i <= 3; i++) {
-              // Tunggu 2 detik
-              await new Promise(resolve => setTimeout(resolve, 2000));
+              // Tunggu 15 detik per ping untuk nahan False Alarm
+              await new Promise(resolve => setTimeout(resolve, 15000));
               
               const currentStatus = await checkDeviceStatus(token, deviceId);
               console.log(`Ping ${i} untuk ${cname}: status = ${currentStatus}`);
