@@ -194,19 +194,22 @@ Mohon segera dicek oleh teknisi.`;
         }
       }
     } else if (actuallyOnline) {
-      if (currentState === 'online') {
-        console.log(`CCTV ${cname} (${deviceId}) sudah online sebelumnya. Abaikan pesan ganda.`);
-      } else {
-        try {
-          // Gunakan UPDATE sebagai Atomic Lock untuk mencegah Race Condition webhook ganda
-          const updateResult = await sql`
-            UPDATE devices SET status = 'online' WHERE device_id = ${deviceId} AND status = 'offline' RETURNING device_id
-          `;
-          
-          if (updateResult.length === 0) {
-            console.log(`[Race Condition] CCTV ${cname} sudah di-update online oleh proses lain.`);
-          } else {
-            const message = 
+      try {
+        // Gunakan UPDATE sebagai Atomic Lock untuk mencegah Race Condition webhook ganda
+        // Walaupun status di DB sudah 'online', kita tetap izinkan update jika last_synced_at sudah lebih dari 30 detik
+        // Ini memastikan webhook duplikat di detik yang sama diblokir, tapi event online sungguhan tetap diproses.
+        const updateResult = await sql`
+          UPDATE devices 
+          SET status = 'online', last_synced_at = NOW()
+          WHERE device_id = ${deviceId} 
+            AND (status = 'offline' OR last_synced_at < NOW() - INTERVAL '30 seconds')
+          RETURNING device_id
+        `;
+        
+        if (updateResult.length === 0) {
+          console.log(`[Race Condition/Duplicate] CCTV ${cname} sudah memproses event online dalam 30 detik terakhir.`);
+        } else {
+          const message = 
 `<b>✅ CCTV KEMBALI NORMAL</b>
 
 📷 Device: <b>${cname}</b>
@@ -227,7 +230,6 @@ CCTV telah beroperasi dan terhubung kembali.`;
         } catch (dbErr) {
           console.error("Database Error (Online Log):", dbErr);
         }
-      }
     }
 
     return NextResponse.json({ code: '0', msg: 'success' }, { status: 200 });
