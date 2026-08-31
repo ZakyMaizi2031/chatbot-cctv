@@ -51,17 +51,26 @@ export async function GET() {
       const found = list.find((d: any) => d.deviceId === '8E0250FPAZ9A4F5');
       results[name] = {
         total_in_page: list.length,
-        found_device: found || 'NOT_FOUND'
+        found_device: found || 'NOT_FOUND',
+        raw_response: json
       };
     }
     
-    // Uji coba deviceBaseDetail
-    const resBase = await fetch(`${IMOU_BASE_URL}/deviceBaseDetail`, {
+    // Uji coba deviceBaseList
+    const resBaseList = await fetch(`${IMOU_BASE_URL}/deviceBaseList`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(buildRequestBody({ token, bindId: -1, limit: 100 })),
+    });
+    results['deviceBaseList'] = await resBaseList.json();
+
+    // Uji coba deviceOnline
+    const resOnline = await fetch(`${IMOU_BASE_URL}/deviceOnline`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(buildRequestBody({ token, deviceId: '8E0250FPAZ9A4F5' })),
     });
-    results['deviceBaseDetail'] = await resBase.json();
+    results['deviceOnline'] = await resOnline.json();
 
     return NextResponse.json({ token_sukses: true, results });
 
