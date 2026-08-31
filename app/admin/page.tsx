@@ -432,10 +432,10 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
             {tab === 'devices' && (
               <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                  <div className="p-6 border-b border-slate-100 bg-blue-50/30 flex flex-wrap items-center justify-between gap-4">
+                  <div className="p-4 border-b border-slate-100 bg-blue-50/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
                     <div>
-                      <h2 className="text-lg font-bold flex items-center gap-2 text-blue-700">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+                      <h2 className="text-base font-bold flex items-center gap-2 text-blue-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
                         Daftar Semua Perangkat (IMOU Cloud)
                       </h2>
                       <p className="text-sm text-slate-500 mt-1">
@@ -452,12 +452,12 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                   <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                       <thead>
-                        <tr className="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider border-b border-slate-100">
-                          <th className="py-3 px-5 font-semibold text-center w-16">No</th>
-                          <th className="py-3 px-5 font-semibold">Nama Perangkat</th>
-                          <th className="py-3 px-5 font-semibold">ID Perangkat</th>
-                          <th className="py-3 px-5 font-semibold text-center">Status Terakhir</th>
-                          <th className="py-3 px-5 font-semibold">Terakhir Disinkron</th>
+                        <tr className="bg-slate-50 text-slate-500 text-[11px] uppercase tracking-wider border-b border-slate-100">
+                          <th className="py-2 px-4 font-semibold text-center w-12">No</th>
+                          <th className="py-2 px-4 font-semibold">Nama Perangkat</th>
+                          <th className="py-2 px-4 font-semibold">ID Perangkat</th>
+                          <th className="py-2 px-4 font-semibold text-center">Status Terakhir</th>
+                          <th className="py-2 px-4 font-semibold">Terakhir Disinkron</th>
                         </tr>
                       </thead>
                       <tbody className="text-sm divide-y divide-slate-100">
@@ -465,15 +465,15 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                           const isOnline = dev.status === 'online';
                           return (
                             <tr key={dev.device_id} className="hover:bg-blue-50/40 transition-colors group">
-                              <td className="py-3 px-5 text-center text-slate-400 font-medium">{index + 1}</td>
-                              <td className="py-3 px-5">
-                                <Link href={`?tab=${tab}&history=${dev.device_id}`} className="font-semibold text-slate-800 group-hover:text-blue-700 transition-colors underline decoration-transparent hover:decoration-blue-700">
+                              <td className="py-1.5 px-4 text-center text-slate-400 font-medium text-xs">{index + 1}</td>
+                              <td className="py-1.5 px-4">
+                                <Link href={`?tab=${tab}&history=${dev.device_id}`} className="font-semibold text-slate-800 text-sm group-hover:text-blue-700 transition-colors underline decoration-transparent hover:decoration-blue-700">
                                   {dev.device_name}
                                 </Link>
                               </td>
-                              <td className="py-3 px-5 font-mono text-xs text-slate-500">{dev.device_id}</td>
-                              <td className="py-3 px-5 text-center">
-                                <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border shadow-sm ${
+                              <td className="py-1.5 px-4 font-mono text-[10px] text-slate-500">{dev.device_id}</td>
+                              <td className="py-1.5 px-4 text-center">
+                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold border shadow-sm ${
                                   isOnline
                                     ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
                                     : dev.status === 'unknown'
@@ -484,7 +484,7 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                                   {dev.status.toUpperCase()}
                                 </span>
                               </td>
-                              <td className="py-3 px-5 text-xs text-slate-500 font-medium">
+                              <td className="py-1.5 px-4 text-[10px] text-slate-500 font-medium">
                                 {new Date(dev.last_synced_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Jakarta' })}
                               </td>
                             </tr>
