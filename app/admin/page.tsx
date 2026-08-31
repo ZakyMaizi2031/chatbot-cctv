@@ -161,7 +161,7 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
           <div className="max-w-[1400px] mx-auto">
             
             {/* Tab Content: Dashboard */}
-            {tab === 'dashboard' && (
+            {!historyId && tab === 'dashboard' && (
               <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-8">
                 
                 {/* Section 1: Summary Cards */}
@@ -304,7 +304,7 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
             )}
 
             {/* Tab Content: Offline History */}
-            {tab === 'offline' && (
+            {!historyId && tab === 'offline' && (
               <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                   <div className="p-4 border-b border-slate-100 bg-red-50/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
@@ -369,7 +369,7 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
             )}
 
             {/* Tab Content: Online History */}
-            {tab === 'online' && (
+            {!historyId && tab === 'online' && (
               <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                   <div className="p-4 border-b border-slate-100 bg-emerald-50/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
@@ -434,7 +434,7 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
             )}
 
             {/* Tab Content: Devices List */}
-            {tab === 'devices' && (
+            {!historyId && tab === 'devices' && (
               <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                   <div className="p-4 border-b border-slate-100 bg-blue-50/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
@@ -520,41 +520,42 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
               </div>
             )}
 
-            {/* History Modal (Option 2) */}
+            {/* History Page View */}
             {historyId && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
-                <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl relative overflow-hidden flex flex-col max-h-[85vh]">
-                  <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                  <div className="p-4 border-b border-slate-100 bg-indigo-50/30 flex items-center justify-between">
                     <div>
-                      <h3 className="font-bold text-slate-800 text-lg flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                        Riwayat {historyDeviceName || 'Perangkat'}
-                      </h3>
-                      <p className="text-[10px] text-slate-500 mt-0.5 font-mono">ID: {historyId}</p>
+                      <h2 className="text-base font-bold flex items-center gap-2 text-indigo-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        Riwayat Perangkat: {historyDeviceName || 'Tidak Diketahui'}
+                      </h2>
+                      <p className="text-sm text-slate-500 mt-1 font-mono">ID: {historyId}</p>
                     </div>
-                    <Link href={`?tab=${tab}`} className="w-8 h-8 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center hover:bg-slate-300 hover:text-slate-700 transition-colors">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    <Link href={`?tab=${tab}`} className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-semibold transition-colors">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                      Kembali
                     </Link>
                   </div>
                   
-                  <div className="p-0 overflow-y-auto flex-1 bg-white">
+                  <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
-                      <thead className="sticky top-0 bg-white/95 backdrop-blur-sm shadow-sm z-10">
-                        <tr className="text-slate-500 text-xs uppercase tracking-wider border-b border-slate-100">
-                          <th className="p-4 font-semibold text-center w-12">No</th>
-                          <th className="p-4 font-semibold">Waktu Kejadian</th>
-                          <th className="p-4 font-semibold text-center">Status</th>
+                      <thead>
+                        <tr className="bg-slate-50 text-slate-500 text-[11px] uppercase tracking-wider border-b border-slate-100">
+                          <th className="py-2 px-4 font-semibold text-center w-12">No</th>
+                          <th className="py-2 px-4 font-semibold">Waktu Kejadian</th>
+                          <th className="py-2 px-4 font-semibold text-center">Status</th>
                         </tr>
                       </thead>
                       <tbody className="text-sm divide-y divide-slate-100">
                         {historyLogs.map((log, index) => (
                           <tr key={index} className="hover:bg-slate-50/50 transition-colors">
-                            <td className="p-4 text-center text-slate-400 font-medium text-xs">{index + 1}</td>
-                            <td className="p-4">
-                              <div className="text-slate-700 font-medium">{new Date(log.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })}</div>
-                              <div className="text-slate-400 text-xs mt-0.5">{new Date(log.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })} WIB</div>
+                            <td className="py-1.5 px-4 text-center text-slate-400 font-medium text-xs">{index + 1}</td>
+                            <td className="py-1.5 px-4">
+                              <div className="text-slate-700 font-medium text-sm">{new Date(log.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })}</div>
+                              <div className="text-slate-400 text-xs mt-0">{new Date(log.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })} WIB</div>
                             </td>
-                            <td className="p-4 text-center">
+                            <td className="py-1.5 px-4 text-center">
                               {log.status === 'online' ? (
                                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold border bg-emerald-50 text-emerald-600 border-emerald-200">
                                   ONLINE
@@ -569,7 +570,7 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                         ))}
                         {historyLogs.length === 0 && (
                           <tr>
-                            <td colSpan={3} className="p-8 text-center text-slate-500 text-sm">Belum ada riwayat tercatat.</td>
+                            <td colSpan={3} className="p-10 text-center text-slate-500 text-sm font-medium">Belum ada riwayat tercatat.</td>
                           </tr>
                         )}
                       </tbody>
