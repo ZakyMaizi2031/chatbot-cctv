@@ -237,16 +237,16 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                       {stats.map((stat, idx) => (
                         <Link href={`?tab=${tab}&history=${stat.device_id}`} key={idx} className="group flex flex-col justify-between bg-white p-4 rounded-xl border border-slate-100 hover:border-red-200 hover:shadow-md hover:shadow-red-50 transition-all duration-300">
                           <div className="flex justify-between items-start mb-3">
-                            <div className="bg-red-50 text-red-600 px-2.5 py-0.5 rounded-md text-xs font-bold border border-red-100 shadow-sm">
+                            <div className="bg-red-50 text-red-600 px-2.5 py-1 rounded-full text-[10px] font-bold border border-red-100 shadow-sm">
                               {stat.offline_count}x Mati
                             </div>
-                            <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:text-red-500 group-hover:bg-red-50 transition-colors">
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                            <div className="w-7 h-7 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:text-red-500 group-hover:bg-red-50 transition-colors">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
                             </div>
                           </div>
                           <div className="flex flex-col">
-                            <span className="font-bold text-slate-800 text-base group-hover:text-red-600 transition-colors line-clamp-1" title={stat.device_name}>{stat.device_name}</span>
-                            <span className="text-xs text-slate-400 font-mono mt-1">{stat.device_id}</span>
+                            <span className="font-semibold text-slate-800 text-sm group-hover:text-red-600 transition-colors line-clamp-1" title={stat.device_name}>{stat.device_name}</span>
+                            <span className="text-[10px] text-slate-400 font-mono mt-0">{stat.device_id}</span>
                           </div>
                         </Link>
                       ))}
