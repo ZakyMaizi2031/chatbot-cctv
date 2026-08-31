@@ -329,7 +329,8 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                       <thead>
                         <tr className="bg-slate-50 text-slate-500 text-[11px] uppercase tracking-wider border-b border-slate-100">
                           <th className="py-2 px-4 font-semibold text-center w-12">No</th>
-                          <th className="py-2 px-4 font-semibold">Waktu Kejadian</th>
+                          <th className="py-2 px-4 font-semibold">Tanggal Kejadian</th>
+                          <th className="py-2 px-4 font-semibold">Jam</th>
                           <th className="py-2 px-4 font-semibold">Perangkat</th>
                           <th className="py-2 px-4 font-semibold text-center">Status</th>
                         </tr>
@@ -340,7 +341,9 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                             <td className="py-1.5 px-4 text-center text-slate-400 font-medium text-xs">{offset + index + 1}</td>
                             <td className="py-1.5 px-4 whitespace-nowrap">
                               <div className="text-slate-700 font-medium text-sm">{new Date(log.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })}</div>
-                              <div className="text-slate-400 text-xs mt-0">{new Date(log.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })} WIB</div>
+                            </td>
+                            <td className="py-1.5 px-4 whitespace-nowrap">
+                              <div className="text-slate-500 font-mono text-xs">{new Date(log.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })} WIB</div>
                             </td>
                             <td className="py-1.5 px-4">
                               <div className="font-semibold text-slate-800 text-sm">{log.device_name}</div>
@@ -355,7 +358,7 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                         ))}
                         {offlineLogs.length === 0 && (
                           <tr>
-                            <td colSpan={4} className="p-10 text-center text-slate-500 text-sm font-medium">Belum ada riwayat kamera mati.</td>
+                            <td colSpan={5} className="p-10 text-center text-slate-500 text-sm font-medium">Belum ada riwayat kamera mati.</td>
                           </tr>
                         )}
                       </tbody>
@@ -394,7 +397,8 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                       <thead>
                         <tr className="bg-slate-50 text-slate-500 text-[11px] uppercase tracking-wider border-b border-slate-100">
                           <th className="py-2 px-4 font-semibold text-center w-12">No</th>
-                          <th className="py-2 px-4 font-semibold">Waktu Pemulihan</th>
+                          <th className="py-2 px-4 font-semibold">Tanggal Pemulihan</th>
+                          <th className="py-2 px-4 font-semibold">Jam</th>
                           <th className="py-2 px-4 font-semibold">Perangkat</th>
                           <th className="py-2 px-4 font-semibold text-center">Status</th>
                         </tr>
@@ -405,7 +409,9 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                             <td className="py-1.5 px-4 text-center text-slate-400 font-medium text-xs">{offset + index + 1}</td>
                             <td className="py-1.5 px-4 whitespace-nowrap">
                               <div className="text-slate-700 font-medium text-sm">{new Date(log.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })}</div>
-                              <div className="text-slate-400 text-xs mt-0">{new Date(log.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })} WIB</div>
+                            </td>
+                            <td className="py-1.5 px-4 whitespace-nowrap">
+                              <div className="text-slate-500 font-mono text-xs">{new Date(log.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })} WIB</div>
                             </td>
                             <td className="py-1.5 px-4">
                               <div className="font-semibold text-slate-800 text-sm">{log.device_name}</div>
@@ -420,7 +426,7 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                         ))}
                         {onlineLogs.length === 0 && (
                           <tr>
-                            <td colSpan={4} className="p-10 text-center text-slate-500 text-sm font-medium">Belum ada riwayat kamera menyala.</td>
+                            <td colSpan={5} className="p-10 text-center text-slate-500 text-sm font-medium">Belum ada riwayat kamera menyala.</td>
                           </tr>
                         )}
                       </tbody>
@@ -547,7 +553,8 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                       <thead>
                         <tr className="bg-slate-50 text-slate-500 text-[11px] uppercase tracking-wider border-b border-slate-100">
                           <th className="py-2 px-4 font-semibold text-center w-12">No</th>
-                          <th className="py-2 px-4 font-semibold">Waktu Kejadian</th>
+                          <th className="py-2 px-4 font-semibold">Tanggal Kejadian</th>
+                          <th className="py-2 px-4 font-semibold">Jam</th>
                           <th className="py-2 px-4 font-semibold text-center">Status</th>
                         </tr>
                       </thead>
@@ -555,9 +562,11 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                         {historyLogs.map((log, index) => (
                           <tr key={index} className="hover:bg-slate-50/50 transition-colors">
                             <td className="py-1.5 px-4 text-center text-slate-400 font-medium text-xs">{offset + index + 1}</td>
-                            <td className="py-1.5 px-4">
+                            <td className="py-1.5 px-4 whitespace-nowrap">
                               <div className="text-slate-700 font-medium text-sm">{new Date(log.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })}</div>
-                              <div className="text-slate-400 text-xs mt-0">{new Date(log.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })} WIB</div>
+                            </td>
+                            <td className="py-1.5 px-4 whitespace-nowrap">
+                              <div className="text-slate-500 font-mono text-xs">{new Date(log.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })} WIB</div>
                             </td>
                             <td className="py-1.5 px-4 text-center">
                               {log.status === 'online' ? (
@@ -574,7 +583,7 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                         ))}
                         {historyLogs.length === 0 && (
                           <tr>
-                            <td colSpan={3} className="p-10 text-center text-slate-500 text-sm font-medium">Belum ada riwayat tercatat.</td>
+                            <td colSpan={4} className="p-10 text-center text-slate-500 text-sm font-medium">Belum ada riwayat tercatat.</td>
                           </tr>
                         )}
                       </tbody>
