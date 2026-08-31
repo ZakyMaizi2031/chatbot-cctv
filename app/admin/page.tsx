@@ -331,7 +331,8 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                           <th className="py-2 px-4 font-semibold text-center w-12">No</th>
                           <th className="py-2 px-4 font-semibold">Tanggal Kejadian</th>
                           <th className="py-2 px-4 font-semibold">Jam</th>
-                          <th className="py-2 px-4 font-semibold">Perangkat</th>
+                          <th className="py-2 px-4 font-semibold">Nama Perangkat</th>
+                          <th className="py-2 px-4 font-semibold">ID Perangkat</th>
                           <th className="py-2 px-4 font-semibold text-center">Status</th>
                         </tr>
                       </thead>
@@ -347,7 +348,9 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                             </td>
                             <td className="py-2.5 px-4">
                               <div className="font-semibold text-slate-800 text-sm">{log.device_name}</div>
-                              <div className="text-slate-400 font-mono text-xs mt-0.5">{log.device_id}</div>
+                            </td>
+                            <td className="py-2.5 px-4 font-mono text-xs text-slate-500">
+                              {log.device_id}
                             </td>
                             <td className="py-2.5 px-4 text-center">
                               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border bg-red-50 text-red-600 border-red-200 shadow-sm">
@@ -358,7 +361,7 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                         ))}
                         {offlineLogs.length === 0 && (
                           <tr>
-                            <td colSpan={5} className="p-10 text-center text-slate-500 text-sm font-medium">Belum ada riwayat kamera mati.</td>
+                            <td colSpan={6} className="p-10 text-center text-slate-500 text-sm font-medium">Belum ada riwayat kamera mati.</td>
                           </tr>
                         )}
                       </tbody>
@@ -399,7 +402,8 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                           <th className="py-2 px-4 font-semibold text-center w-12">No</th>
                           <th className="py-2 px-4 font-semibold">Tanggal Pemulihan</th>
                           <th className="py-2 px-4 font-semibold">Jam</th>
-                          <th className="py-2 px-4 font-semibold">Perangkat</th>
+                          <th className="py-2 px-4 font-semibold">Nama Perangkat</th>
+                          <th className="py-2 px-4 font-semibold">ID Perangkat</th>
                           <th className="py-2 px-4 font-semibold text-center">Status</th>
                         </tr>
                       </thead>
@@ -415,8 +419,10 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                             </td>
                             <td className="py-2.5 px-4">
                               <div className="font-semibold text-slate-800 text-sm">{log.device_name}</div>
-                              <div className="text-slate-400 font-mono text-xs mt-0.5">{log.device_id}</div>
-                          </td>
+                            </td>
+                            <td className="py-2.5 px-4 font-mono text-xs text-slate-500">
+                              {log.device_id}
+                            </td>
                             <td className="py-2.5 px-4 text-center">
                               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border bg-emerald-50 text-emerald-600 border-emerald-200 shadow-sm">
                                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> ONLINE
@@ -426,7 +432,7 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                         ))}
                         {onlineLogs.length === 0 && (
                           <tr>
-                            <td colSpan={5} className="p-10 text-center text-slate-500 text-sm font-medium">Belum ada riwayat kamera menyala.</td>
+                            <td colSpan={6} className="p-10 text-center text-slate-500 text-sm font-medium">Belum ada riwayat kamera menyala.</td>
                           </tr>
                         )}
                       </tbody>
