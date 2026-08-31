@@ -26,14 +26,18 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
   // History Modal Variables
   let historyLogs: any[] = [];
   let historyDeviceName = '';
+  let totalHistoryItems = 0;
   const historyId = searchParams.history || null;
   if (historyId) {
+    const historyCountRes = await sql`SELECT COUNT(*) FROM notification_logs WHERE device_id = ${historyId} AND status = 'offline'`;
+    totalHistoryItems = parseInt(historyCountRes[0].count);
+
     historyLogs = await sql`
       SELECT status, created_at 
       FROM notification_logs 
       WHERE device_id = ${historyId} AND status = 'offline'
       ORDER BY created_at DESC 
-      LIMIT 100
+      LIMIT ${itemsPerPage} OFFSET ${offset}
     `;
     const nameRes = await sql`SELECT device_name FROM devices WHERE device_id = ${historyId} LIMIT 1`;
     if (nameRes.length > 0) historyDeviceName = nameRes[0].device_name;
@@ -550,7 +554,7 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                       <tbody className="text-sm divide-y divide-slate-100">
                         {historyLogs.map((log, index) => (
                           <tr key={index} className="hover:bg-slate-50/50 transition-colors">
-                            <td className="py-1.5 px-4 text-center text-slate-400 font-medium text-xs">{index + 1}</td>
+                            <td className="py-1.5 px-4 text-center text-slate-400 font-medium text-xs">{offset + index + 1}</td>
                             <td className="py-1.5 px-4">
                               <div className="text-slate-700 font-medium text-sm">{new Date(log.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })}</div>
                               <div className="text-slate-400 text-xs mt-0">{new Date(log.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })} WIB</div>
@@ -576,6 +580,13 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                       </tbody>
                     </table>
                   </div>
+                  <Pagination 
+                    currentPage={currentPage}
+                    totalPages={Math.ceil(totalHistoryItems / itemsPerPage) || 1}
+                    totalItems={totalHistoryItems}
+                    itemsPerPage={itemsPerPage}
+                    tab={tab}
+                  />
                 </div>
               </div>
             )}
