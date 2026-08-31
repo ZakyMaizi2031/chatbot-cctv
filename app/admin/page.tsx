@@ -4,6 +4,7 @@ import SyncButton from './SyncButton';
 import Pagination from './Pagination';
 import DatePicker from './DatePicker';
 import SearchBar from './SearchBar';
+import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,6 +22,22 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
   let onlineLogs: any[] = [];
   let devices: any[] = [];
   let stats: any[] = [];
+  
+  // History Modal Variables
+  let historyLogs: any[] = [];
+  let historyDeviceName = '';
+  const historyId = searchParams.history || null;
+  if (historyId) {
+    historyLogs = await sql`
+      SELECT status, created_at 
+      FROM notification_logs 
+      WHERE device_id = ${historyId} 
+      ORDER BY created_at DESC 
+      LIMIT 50
+    `;
+    const nameRes = await sql`SELECT device_name FROM devices WHERE device_id = ${historyId} LIMIT 1`;
+    if (nameRes.length > 0) historyDeviceName = nameRes[0].device_name;
+  }
   
   // Dashboard Specific Variables
   let totalDevices = 0;
@@ -90,9 +107,11 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
       LIMIT ${itemsPerPage} OFFSET ${offset}
     `;
   } else if (tab === 'devices') {
+    const searchCondition = searchQuery ? sql`WHERE device_name ILIKE ${'%' + searchQuery + '%'}` : sql``;
     devices = await sql`
       SELECT device_id, device_name, status, last_synced_at
       FROM devices
+      ${searchCondition}
       ORDER BY device_name ASC
     `;
   }
@@ -203,20 +222,20 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                     </div>
                     <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4 overflow-y-auto max-h-[500px]">
                       {stats.map((stat, idx) => (
-                        <div key={idx} className="group flex flex-col justify-between bg-white p-5 rounded-2xl border border-slate-100 hover:border-red-200 hover:shadow-lg hover:shadow-red-50 transition-all duration-300">
+                        <Link href={`?tab=${tab}&history=${stat.device_id}`} key={idx} className="group flex flex-col justify-between bg-white p-5 rounded-2xl border border-slate-100 hover:border-red-200 hover:shadow-lg hover:shadow-red-50 transition-all duration-300">
                           <div className="flex justify-between items-start mb-4">
                             <div className="bg-red-50 text-red-600 px-3 py-1 rounded-lg text-sm font-bold border border-red-100 shadow-sm">
                               {stat.offline_count}x Mati
                             </div>
                             <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:text-red-500 group-hover:bg-red-50 transition-colors">
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
                             </div>
                           </div>
                           <div className="flex flex-col">
                             <span className="font-bold text-slate-800 text-lg group-hover:text-red-600 transition-colors line-clamp-1" title={stat.device_name}>{stat.device_name}</span>
                             <span className="text-xs text-slate-400 font-mono mt-1">{stat.device_id}</span>
                           </div>
-                        </div>
+                        </Link>
                       ))}
                       {stats.length === 0 && (
                         <div className="col-span-full text-center py-16 bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
@@ -416,8 +435,11 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                       </p>
                     </div>
                     
-                    {/* Sync Button */}
-                    <SyncButton />
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                      <SearchBar tab="devices" />
+                      {/* Sync Button */}
+                      <SyncButton />
+                    </div>
                   </div>
                   <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
@@ -434,7 +456,11 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                           const isOnline = dev.status === 'online';
                           return (
                             <tr key={dev.device_id} className="hover:bg-blue-50/40 transition-colors group">
-                              <td className="p-5 font-semibold text-slate-800 group-hover:text-blue-700 transition-colors">{dev.device_name}</td>
+                              <td className="p-5">
+                                <Link href={`?tab=${tab}&history=${dev.device_id}`} className="font-semibold text-slate-800 group-hover:text-blue-700 transition-colors underline decoration-transparent hover:decoration-blue-700">
+                                  {dev.device_name}
+                                </Link>
+                              </td>
                               <td className="p-5 font-mono text-xs text-slate-500">{dev.device_id}</td>
                               <td className="p-5 text-center">
                                 <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border shadow-sm ${
@@ -471,6 +497,64 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                 </div>
               </div>
             )}
+
+            {/* History Modal (Option 2) */}
+            {historyId && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
+                <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl relative overflow-hidden flex flex-col max-h-[85vh]">
+                  <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+                    <div>
+                      <h3 className="font-bold text-slate-800 text-lg flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        Riwayat {historyDeviceName || 'Perangkat'}
+                      </h3>
+                      <p className="text-[10px] text-slate-500 mt-0.5 font-mono">ID: {historyId}</p>
+                    </div>
+                    <Link href={`?tab=${tab}`} className="w-8 h-8 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center hover:bg-slate-300 hover:text-slate-700 transition-colors">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </Link>
+                  </div>
+                  
+                  <div className="p-0 overflow-y-auto flex-1 bg-white">
+                    <table className="w-full text-left border-collapse">
+                      <thead className="sticky top-0 bg-white/95 backdrop-blur-sm shadow-sm z-10">
+                        <tr className="text-slate-500 text-xs uppercase tracking-wider border-b border-slate-100">
+                          <th className="p-4 font-semibold">Waktu Kejadian</th>
+                          <th className="p-4 font-semibold text-center">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="text-sm divide-y divide-slate-100">
+                        {historyLogs.map((log, i) => (
+                          <tr key={i} className="hover:bg-slate-50/50 transition-colors">
+                            <td className="p-4">
+                              <div className="text-slate-700 font-medium">{new Date(log.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })}</div>
+                              <div className="text-slate-400 text-xs mt-0.5">{new Date(log.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })} WIB</div>
+                            </td>
+                            <td className="p-4 text-center">
+                              {log.status === 'online' ? (
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold border bg-emerald-50 text-emerald-600 border-emerald-200">
+                                  ONLINE
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold border bg-red-50 text-red-600 border-red-200">
+                                  OFFLINE
+                                </span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                        {historyLogs.length === 0 && (
+                          <tr>
+                            <td colSpan={2} className="p-8 text-center text-slate-500 text-sm">Belum ada riwayat tercatat.</td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+            
           </div>
         </main>
       </div>
