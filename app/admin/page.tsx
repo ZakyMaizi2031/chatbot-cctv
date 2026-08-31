@@ -31,9 +31,9 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
     historyLogs = await sql`
       SELECT status, created_at 
       FROM notification_logs 
-      WHERE device_id = ${historyId} 
+      WHERE device_id = ${historyId} AND status = 'offline'
       ORDER BY created_at DESC 
-      LIMIT 50
+      LIMIT 100
     `;
     const nameRes = await sql`SELECT device_name FROM devices WHERE device_id = ${historyId} LIMIT 1`;
     if (nameRes.length > 0) historyDeviceName = nameRes[0].device_name;
