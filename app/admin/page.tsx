@@ -50,10 +50,14 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
   // Fetch only what's needed for the active tab
   if (tab === 'dashboard') {
     stats = await sql`
-      SELECT device_name, device_id, COUNT(*) as offline_count
-      FROM notification_logs
-      WHERE status = 'offline'
-      GROUP BY device_name, device_id
+      SELECT 
+        COALESCE(d.device_name, MAX(n.device_name)) as device_name, 
+        n.device_id, 
+        COUNT(n.id) as offline_count
+      FROM notification_logs n
+      LEFT JOIN devices d ON n.device_id = d.device_id
+      WHERE n.status = 'offline'
+      GROUP BY n.device_id, d.device_name
       ORDER BY offline_count DESC
     `;
     
