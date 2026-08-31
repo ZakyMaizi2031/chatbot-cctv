@@ -36,7 +36,8 @@ export async function GET() {
 
     // Daftar skenario parameter yang akan dicoba
     const scenarios = {
-      'listDeviceDetailsByPage': { token, page: 1, pageSize: 1 } // Ambil 1 device saja untuk diinspeksi
+      'listDeviceDetailsByPage_page1': { token, page: 1, pageSize: 100 },
+      'listDeviceDetailsByPage_page2': { token, page: 2, pageSize: 100 },
     };
 
     for (const [name, params] of Object.entries(scenarios)) {
@@ -46,8 +47,21 @@ export async function GET() {
         body: JSON.stringify(buildRequestBody(params)),
       });
       const json = await res.json();
-      results['raw_device_data'] = json.result?.data?.deviceList?.[0] || 'Tidak ada device yang ditemukan';
+      const list = json.result?.data?.deviceList || [];
+      const found = list.find((d: any) => d.deviceId === '8E0250FPAZ9A4F5');
+      results[name] = {
+        total_in_page: list.length,
+        found_device: found || 'NOT_FOUND'
+      };
     }
+    
+    // Uji coba deviceBaseDetail
+    const resBase = await fetch(`${IMOU_BASE_URL}/deviceBaseDetail`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(buildRequestBody({ token, deviceId: '8E0250FPAZ9A4F5' })),
+    });
+    results['deviceBaseDetail'] = await resBase.json();
 
     return NextResponse.json({ token_sukses: true, results });
 

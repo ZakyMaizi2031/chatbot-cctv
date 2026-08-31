@@ -42,30 +42,83 @@ async function getAccessToken(): Promise<string> {
   }
 }
 
+// === Cache & Deduplication untuk listDeviceDetailsByPage ===
+let cachedDeviceList: any[] = [];
+let cachedDeviceListTime = 0;
+let pendingFetchPromise: Promise<any[]> | null = null;
+
+async function fetchDeviceList(token: string): Promise<any[]> {
+  // Cache valid untuk 10 detik
+  if (Date.now() - cachedDeviceListTime < 10000 && cachedDeviceList.length > 0) {
+    return cachedDeviceList;
+  }
+  
+  // Jika sedang ada request yang berjalan, tunggu request tersebut selesai (Deduplikasi)
+  if (pendingFetchPromise) {
+    return pendingFetchPromise;
+  }
+  
+  pendingFetchPromise = (async () => {
+    try {
+      const body = buildRequestBody({ token, page: 1, pageSize: 100 });
+      const res = await fetch(`${IMOU_BASE_URL}/listDeviceDetailsByPage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        signal: AbortSignal.timeout(5000),
+      });
+      const json = await res.json();
+      
+      if (json.result?.code !== '0') {
+        console.error(`IMOU API Error (listDeviceDetailsByPage):`, JSON.stringify(json));
+        pendingFetchPromise = null;
+        return [];
+      }
+      
+      const list = json.result?.data?.deviceList || [];
+      if (list.length > 0) {
+        cachedDeviceList = list;
+        cachedDeviceListTime = Date.now();
+      }
+      pendingFetchPromise = null;
+      return list;
+    } catch (e) {
+      console.error("Gagal fetchDeviceList:", e);
+      pendingFetchPromise = null;
+      return [];
+    }
+  })();
+  
+  return pendingFetchPromise;
+}
+
 // === Helper: Cek Status Realtime Device ===
 async function checkDeviceStatus(token: string, deviceId: string): Promise<'online'|'offline'|'unknown'> {
   try {
-    // OPSI A: Gunakan listDeviceDetailsByPage (Pasti Berhasil) tapi difilter khusus 1 device biar gak berat
-    const body = buildRequestBody({ token, page: 1, pageSize: 1, deviceIdList: deviceId });
-    const res = await fetch(`${IMOU_BASE_URL}/listDeviceDetailsByPage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-      signal: AbortSignal.timeout(5000),
-    });
-    const json = await res.json();
-    if (json.result?.code !== '0') {
-      console.error(`IMOU API Error (listDeviceDetailsByPage) untuk ${deviceId}:`, JSON.stringify(json));
-      return 'unknown';
-    }
+    const deviceList = await fetchDeviceList(token);
     
-    const deviceList = json.result?.data?.deviceList || [];
-    const d = deviceList.find((dev: any) => 
+    let d = deviceList.find((dev: any) => 
       dev.deviceId === deviceId || dev.did === deviceId || dev.sn === deviceId
     );
 
+    // Fallback: Jika tidak ditemukan di listDeviceDetailsByPage (misal karena shared device), coba cek satuan
     if (!d) {
-      console.error(`Kamera ${deviceId} tidak ditemukan di daftar IMOU.`);
+      console.log(`Kamera ${deviceId} tidak ada di list utama, mencoba deviceBaseDetail...`);
+      const bodyBase = buildRequestBody({ token, deviceId });
+      const resBase = await fetch(`${IMOU_BASE_URL}/deviceBaseDetail`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bodyBase),
+        signal: AbortSignal.timeout(5000),
+      });
+      const jsonBase = await resBase.json();
+      if (jsonBase.result?.code === '0' && jsonBase.result?.data) {
+        d = jsonBase.result.data;
+      }
+    }
+
+    if (!d) {
+      console.error(`Kamera ${deviceId} benar-benar tidak ditemukan di API IMOU.`);
       return 'unknown';
     }
 
