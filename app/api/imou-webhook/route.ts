@@ -45,23 +45,36 @@ async function getAccessToken(): Promise<string> {
 // === Helper: Cek Status Realtime Device ===
 async function checkDeviceStatus(token: string, deviceId: string): Promise<'online'|'offline'|'unknown'> {
   try {
-    const body = buildRequestBody({ token, deviceId });
-    const res = await fetch(`${IMOU_BASE_URL}/deviceBaseDetail`, {
+    // OPSI A: Gunakan listDeviceDetailsByPage (Pasti Berhasil)
+    const body = buildRequestBody({ token, page: 1, pageSize: 100 });
+    const res = await fetch(`${IMOU_BASE_URL}/listDeviceDetailsByPage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
       signal: AbortSignal.timeout(5000),
     });
     const json = await res.json();
-    if (json.result?.code !== '0') return 'unknown';
+    if (json.result?.code !== '0') {
+      console.error(`IMOU API Error (listDeviceDetailsByPage) untuk ${deviceId}:`, JSON.stringify(json));
+      return 'unknown';
+    }
     
-    const d = json.result?.data;
-    if (!d) return 'unknown';
+    const deviceList = json.result?.data?.deviceList || [];
+    const d = deviceList.find((dev: any) => 
+      dev.deviceId === deviceId || dev.did === deviceId || dev.sn === deviceId
+    );
+
+    if (!d) {
+      console.error(`Kamera ${deviceId} tidak ditemukan di daftar IMOU.`);
+      return 'unknown';
+    }
 
     const isOnline = 
       d.deviceStatus === 'online' || d.deviceStatus === 1 || 
       d.status === 'online' || d.status === 1 || d.status === '1' || 
-      d.onLine === 1 || d.onLine === '1' || d.online === true;
+      String(d.status).toLowerCase() === 'online' ||
+      d.onLine === 1 || d.onLine === '1' || d.online === true ||
+      String(d.online).toLowerCase() === 'online';
       
     return isOnline ? 'online' : 'offline';
   } catch (error) {
@@ -143,7 +156,7 @@ export async function POST(req: Request) {
         try {
           const token = await getAccessToken();
           if (token) {
-            let finalStatus = 'offline';
+            let finalStatus = 'unknown'; // Default ke unknown biar aman kalau IMOU error
             for (let i = 1; i <= 3; i++) {
               // Tunggu 15 detik per ping untuk nahan False Alarm
               await new Promise(resolve => setTimeout(resolve, 15000));
@@ -155,17 +168,24 @@ export async function POST(req: Request) {
                 finalStatus = 'online';
                 console.log(`Batal kirim notifikasi mati: CCTV ${cname} ternyata sudah online di ping ke-${i}`);
                 break;
+              } else if (currentStatus === 'offline') {
+                finalStatus = 'offline';
               }
             }
+            
+            // HANYA kirim pesan jika beneran terbukti OFFLINE (menolak error 'unknown')
             isConfirmedOffline = (finalStatus === 'offline');
+            if (finalStatus === 'unknown') {
+              console.log(`Batal kirim notifikasi mati: IMOU API Error ('unknown' terus). Menghindari false alarm.`);
+            }
           } else {
-            // Fallback: Jika gagal dapat token, anggap offline saja
-            console.log("Token IMOU gagal didapat, fallback anggap offline.");
-            isConfirmedOffline = true;
+            // Fallback: Jika gagal dapat token, BATALKAN notifikasi untuk mencegah spam
+            console.log("Token IMOU gagal didapat, membatalkan notifikasi untuk mencegah spam.");
+            isConfirmedOffline = false;
           }
         } catch (pingErr) {
           console.error("Gagal melakukan ping ke IMOU API:", pingErr);
-          isConfirmedOffline = true; // Fallback
+          isConfirmedOffline = false; // Fallback aman
         }
 
         if (isConfirmedOffline) {
