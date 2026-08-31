@@ -327,7 +327,7 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                   <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                       <thead>
-                        <tr className="bg-slate-50 text-slate-500 text-[11px] uppercase tracking-wider border-b border-slate-100">
+                        <tr className="bg-slate-50 text-slate-500 text-xs font-semibold uppercase tracking-wider border-b border-slate-100">
                           <th className="py-2 px-4 font-semibold text-center w-12">No</th>
                           <th className="py-2 px-4 font-semibold">Tanggal Kejadian</th>
                           <th className="py-2 px-4 font-semibold">Jam</th>
@@ -338,19 +338,19 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                       <tbody className="text-sm divide-y divide-slate-100">
                         {offlineLogs.map((log, index) => (
                           <tr key={log.id} className="hover:bg-red-50/50 transition-colors group">
-                            <td className="py-1.5 px-4 text-center text-slate-400 font-medium text-xs">{offset + index + 1}</td>
-                            <td className="py-1.5 px-4 whitespace-nowrap">
+                            <td className="py-2.5 px-4 text-center text-slate-400 font-medium text-sm">{offset + index + 1}</td>
+                            <td className="py-2.5 px-4 whitespace-nowrap">
                               <div className="text-slate-700 font-medium text-sm">{new Date(log.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })}</div>
                             </td>
-                            <td className="py-1.5 px-4 whitespace-nowrap">
+                            <td className="py-2.5 px-4 whitespace-nowrap">
                               <div className="text-slate-500 font-mono text-xs">{new Date(log.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })} WIB</div>
                             </td>
-                            <td className="py-1.5 px-4">
+                            <td className="py-2.5 px-4">
                               <div className="font-semibold text-slate-800 text-sm">{log.device_name}</div>
-                              <div className="text-slate-400 font-mono text-[10px] mt-0">{log.device_id}</div>
+                              <div className="text-slate-400 font-mono text-xs mt-0.5">{log.device_id}</div>
                             </td>
-                            <td className="py-1.5 px-4 text-center">
-                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold border bg-red-50 text-red-600 border-red-200 shadow-sm">
+                            <td className="py-2.5 px-4 text-center">
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border bg-red-50 text-red-600 border-red-200 shadow-sm">
                                 <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span> OFFLINE
                               </span>
                             </td>
@@ -395,7 +395,7 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                   <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                       <thead>
-                        <tr className="bg-slate-50 text-slate-500 text-[11px] uppercase tracking-wider border-b border-slate-100">
+                        <tr className="bg-slate-50 text-slate-500 text-xs font-semibold uppercase tracking-wider border-b border-slate-100">
                           <th className="py-2 px-4 font-semibold text-center w-12">No</th>
                           <th className="py-2 px-4 font-semibold">Tanggal Pemulihan</th>
                           <th className="py-2 px-4 font-semibold">Jam</th>
@@ -406,19 +406,19 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                       <tbody className="text-sm divide-y divide-slate-100">
                         {onlineLogs.map((log, index) => (
                           <tr key={log.id} className="hover:bg-emerald-50/50 transition-colors group">
-                            <td className="py-1.5 px-4 text-center text-slate-400 font-medium text-xs">{offset + index + 1}</td>
-                            <td className="py-1.5 px-4 whitespace-nowrap">
+                            <td className="py-2.5 px-4 text-center text-slate-400 font-medium text-sm">{offset + index + 1}</td>
+                            <td className="py-2.5 px-4 whitespace-nowrap">
                               <div className="text-slate-700 font-medium text-sm">{new Date(log.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })}</div>
                             </td>
-                            <td className="py-1.5 px-4 whitespace-nowrap">
+                            <td className="py-2.5 px-4 whitespace-nowrap">
                               <div className="text-slate-500 font-mono text-xs">{new Date(log.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })} WIB</div>
                             </td>
-                            <td className="py-1.5 px-4">
+                            <td className="py-2.5 px-4">
                               <div className="font-semibold text-slate-800 text-sm">{log.device_name}</div>
-                              <div className="text-slate-400 font-mono text-[10px] mt-0">{log.device_id}</div>
+                              <div className="text-slate-400 font-mono text-xs mt-0.5">{log.device_id}</div>
                           </td>
-                            <td className="py-1.5 px-4 text-center">
-                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold border bg-emerald-50 text-emerald-600 border-emerald-200 shadow-sm">
+                            <td className="py-2.5 px-4 text-center">
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border bg-emerald-50 text-emerald-600 border-emerald-200 shadow-sm">
                                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> ONLINE
                               </span>
                             </td>
@@ -467,7 +467,7 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                   <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                       <thead>
-                        <tr className="bg-slate-50 text-slate-500 text-[11px] uppercase tracking-wider border-b border-slate-100">
+                        <tr className="bg-slate-50 text-slate-500 text-xs font-semibold uppercase tracking-wider border-b border-slate-100">
                           <th className="py-2 px-4 font-semibold text-center w-12">No</th>
                           <th className="py-2 px-4 font-semibold">Nama Perangkat</th>
                           <th className="py-2 px-4 font-semibold">ID Perangkat</th>
@@ -480,15 +480,15 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                           const isOnline = dev.status === 'online';
                           return (
                             <tr key={dev.device_id} className="hover:bg-blue-50/40 transition-colors group">
-                              <td className="py-1.5 px-4 text-center text-slate-400 font-medium text-xs">{offset + index + 1}</td>
-                              <td className="py-1.5 px-4">
+                              <td className="py-2.5 px-4 text-center text-slate-400 font-medium text-sm">{offset + index + 1}</td>
+                              <td className="py-2.5 px-4">
                                 <Link href={`?tab=${tab}&history=${dev.device_id}`} className="font-semibold text-slate-800 text-sm group-hover:text-blue-700 transition-colors underline decoration-transparent hover:decoration-blue-700">
                                   {dev.device_name}
                                 </Link>
                               </td>
-                              <td className="py-1.5 px-4 font-mono text-[10px] text-slate-500">{dev.device_id}</td>
-                              <td className="py-1.5 px-4 text-center">
-                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold border shadow-sm ${
+                              <td className="py-2.5 px-4 font-mono text-xs text-slate-500">{dev.device_id}</td>
+                              <td className="py-2.5 px-4 text-center">
+                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border shadow-sm ${
                                   isOnline
                                     ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
                                     : dev.status === 'unknown'
@@ -499,7 +499,7 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                                   {dev.status.toUpperCase()}
                                 </span>
                               </td>
-                              <td className="py-1.5 px-4 text-[10px] text-slate-500 font-medium">
+                              <td className="py-2.5 px-4 text-slate-500 text-xs">
                                 {new Date(dev.last_synced_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Jakarta' })}
                               </td>
                             </tr>
@@ -551,7 +551,7 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                   <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                       <thead>
-                        <tr className="bg-slate-50 text-slate-500 text-[11px] uppercase tracking-wider border-b border-slate-100">
+                        <tr className="bg-slate-50 text-slate-500 text-xs font-semibold uppercase tracking-wider border-b border-slate-100">
                           <th className="py-2 px-4 font-semibold text-center w-12">No</th>
                           <th className="py-2 px-4 font-semibold">Tanggal Kejadian</th>
                           <th className="py-2 px-4 font-semibold">Jam</th>
@@ -561,20 +561,20 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                       <tbody className="text-sm divide-y divide-slate-100">
                         {historyLogs.map((log, index) => (
                           <tr key={index} className="hover:bg-slate-50/50 transition-colors">
-                            <td className="py-1.5 px-4 text-center text-slate-400 font-medium text-xs">{offset + index + 1}</td>
-                            <td className="py-1.5 px-4 whitespace-nowrap">
+                            <td className="py-2.5 px-4 text-center text-slate-400 font-medium text-sm">{offset + index + 1}</td>
+                            <td className="py-2.5 px-4 whitespace-nowrap">
                               <div className="text-slate-700 font-medium text-sm">{new Date(log.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })}</div>
                             </td>
-                            <td className="py-1.5 px-4 whitespace-nowrap">
+                            <td className="py-2.5 px-4 whitespace-nowrap">
                               <div className="text-slate-500 font-mono text-xs">{new Date(log.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })} WIB</div>
                             </td>
-                            <td className="py-1.5 px-4 text-center">
+                            <td className="py-2.5 px-4 text-center">
                               {log.status === 'online' ? (
-                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold border bg-emerald-50 text-emerald-600 border-emerald-200">
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border bg-emerald-50 text-emerald-600 border-emerald-200">
                                   ONLINE
                                 </span>
                               ) : (
-                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold border bg-red-50 text-red-600 border-red-200">
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border bg-red-50 text-red-600 border-red-200">
                                   OFFLINE
                                 </span>
                               )}
