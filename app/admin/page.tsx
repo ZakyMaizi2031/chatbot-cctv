@@ -166,7 +166,7 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
             
             {/* Tab Content: Dashboard */}
             {!historyId && tab === 'dashboard' && (
-              <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-8">
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-5">
                 
                 {/* Section 1: Summary Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -219,7 +219,7 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
                   {/* Section 2: Frekuensi Kerusakan */}
                   <div className="xl:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
                     <div className="p-6 border-b border-slate-100 bg-slate-50/50">
@@ -233,11 +233,11 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                         Analisis kamera yang paling sering terputus (offline).
                       </p>
                     </div>
-                    <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4 overflow-y-auto max-h-[500px]">
+                    <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-3 overflow-y-auto max-h-[500px]">
                       {stats.map((stat, idx) => (
-                        <Link href={`?tab=${tab}&history=${stat.device_id}`} key={idx} className="group flex flex-col justify-between bg-white p-5 rounded-2xl border border-slate-100 hover:border-red-200 hover:shadow-lg hover:shadow-red-50 transition-all duration-300">
-                          <div className="flex justify-between items-start mb-4">
-                            <div className="bg-red-50 text-red-600 px-3 py-1 rounded-lg text-sm font-bold border border-red-100 shadow-sm">
+                        <Link href={`?tab=${tab}&history=${stat.device_id}`} key={idx} className="group flex flex-col justify-between bg-white p-4 rounded-xl border border-slate-100 hover:border-red-200 hover:shadow-md hover:shadow-red-50 transition-all duration-300">
+                          <div className="flex justify-between items-start mb-3">
+                            <div className="bg-red-50 text-red-600 px-2.5 py-0.5 rounded-md text-xs font-bold border border-red-100 shadow-sm">
                               {stat.offline_count}x Mati
                             </div>
                             <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:text-red-500 group-hover:bg-red-50 transition-colors">
@@ -245,7 +245,7 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                             </div>
                           </div>
                           <div className="flex flex-col">
-                            <span className="font-bold text-slate-800 text-lg group-hover:text-red-600 transition-colors line-clamp-1" title={stat.device_name}>{stat.device_name}</span>
+                            <span className="font-bold text-slate-800 text-base group-hover:text-red-600 transition-colors line-clamp-1" title={stat.device_name}>{stat.device_name}</span>
                             <span className="text-xs text-slate-400 font-mono mt-1">{stat.device_id}</span>
                           </div>
                         </Link>
