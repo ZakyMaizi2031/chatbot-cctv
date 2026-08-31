@@ -233,7 +233,7 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                         Analisis kamera yang paling sering terputus (offline).
                       </p>
                     </div>
-                    <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-3 overflow-y-auto max-h-[500px]">
+                    <div className="p-5 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 overflow-y-auto max-h-[500px]">
                       {stats.map((stat, idx) => (
                         <Link href={`?tab=${tab}&history=${stat.device_id}`} key={idx} className="group flex flex-col justify-between bg-white p-4 rounded-xl border border-slate-100 hover:border-red-200 hover:shadow-md hover:shadow-red-50 transition-all duration-300">
                           <div className="flex justify-between items-start mb-3">
