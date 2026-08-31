@@ -222,14 +222,14 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
                   {/* Section 2: Frekuensi Kerusakan */}
                   <div className="xl:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
-                    <div className="p-6 border-b border-slate-100 bg-slate-50/50">
-                      <h2 className="text-lg font-bold flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <div className="p-5 border-b border-slate-100 bg-slate-50/50">
+                      <h2 className="text-base font-bold flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M12 20v-6M6 20V10M18 20V4" />
                         </svg>
                         Frekuensi Kerusakan Kamera
                       </h2>
-                      <p className="text-sm text-slate-500 mt-1">
+                      <p className="text-xs text-slate-500 mt-0.5">
                         Analisis kamera yang paling sering terputus (offline).
                       </p>
                     </div>
@@ -264,16 +264,16 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
 
                   {/* Section 3: Recent Activity Feed */}
                   <div className="xl:col-span-1 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
-                    <div className="p-6 border-b border-slate-100 bg-slate-50/50">
-                      <h2 className="text-lg font-bold flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                    <div className="p-5 border-b border-slate-100 bg-slate-50/50">
+                      <h2 className="text-base font-bold flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
                         Aktivitas Terakhir
                       </h2>
-                      <p className="text-sm text-slate-500 mt-1">
+                      <p className="text-xs text-slate-500 mt-0.5">
                         Kejadian koneksi terbaru di seluruh jaringan.
                       </p>
                     </div>
-                    <div className="p-6 flex-1 overflow-y-auto">
+                    <div className="p-5 flex-1 overflow-y-auto">
                       <div className="relative border-l-2 border-slate-100 ml-3 space-y-6">
                         {recentLogs.map((log) => {
                           const isOnline = log.status === 'online';
