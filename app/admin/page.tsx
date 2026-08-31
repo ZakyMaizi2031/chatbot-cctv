@@ -112,11 +112,16 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
     `;
   } else if (tab === 'devices') {
     const searchCondition = searchQuery ? sql`WHERE device_name ILIKE ${'%' + searchQuery + '%'} OR device_id ILIKE ${'%' + searchQuery + '%'}` : sql``;
+    
+    const countResult = await sql`SELECT COUNT(*) FROM devices ${searchCondition}`;
+    totalDevices = parseInt(countResult[0].count);
+
     devices = await sql`
       SELECT device_id, device_name, status, last_synced_at
       FROM devices
       ${searchCondition}
       ORDER BY device_name ASC
+      LIMIT ${itemsPerPage} OFFSET ${offset}
     `;
   }
 
@@ -439,7 +444,7 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                         Daftar Semua Perangkat (IMOU Cloud)
                       </h2>
                       <p className="text-sm text-slate-500 mt-1">
-                        Total <span className="font-bold text-blue-700">{devices.length}</span> perangkat terdaftar di sistem.
+                        Total <span className="font-bold text-blue-700">{totalDevices}</span> perangkat terdaftar di sistem.
                       </p>
                     </div>
                     
@@ -465,7 +470,7 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                           const isOnline = dev.status === 'online';
                           return (
                             <tr key={dev.device_id} className="hover:bg-blue-50/40 transition-colors group">
-                              <td className="py-1.5 px-4 text-center text-slate-400 font-medium text-xs">{index + 1}</td>
+                              <td className="py-1.5 px-4 text-center text-slate-400 font-medium text-xs">{offset + index + 1}</td>
                               <td className="py-1.5 px-4">
                                 <Link href={`?tab=${tab}&history=${dev.device_id}`} className="font-semibold text-slate-800 text-sm group-hover:text-blue-700 transition-colors underline decoration-transparent hover:decoration-blue-700">
                                   {dev.device_name}
@@ -504,6 +509,13 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                       </tbody>
                     </table>
                   </div>
+                  <Pagination 
+                    currentPage={currentPage}
+                    totalPages={Math.ceil(totalDevices / itemsPerPage) || 1}
+                    totalItems={totalDevices}
+                    itemsPerPage={itemsPerPage}
+                    tab="devices"
+                  />
                 </div>
               </div>
             )}
