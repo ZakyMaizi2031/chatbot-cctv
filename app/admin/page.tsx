@@ -157,7 +157,7 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
         </header>
 
         {/* Dynamic Content Based on Tab */}
-        <main className="flex-1 overflow-x-hidden p-8">
+        <main className="flex-1 overflow-x-hidden p-4 sm:p-5">
           <div className="max-w-[1400px] mx-auto">
             
             {/* Tab Content: Dashboard */}
