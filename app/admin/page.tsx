@@ -319,14 +319,16 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                     <table className="w-full text-left border-collapse">
                       <thead>
                         <tr className="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider border-b border-slate-100">
+                          <th className="p-5 font-semibold text-center w-16">No</th>
                           <th className="p-5 font-semibold">Waktu Kejadian</th>
                           <th className="p-5 font-semibold">Perangkat</th>
                           <th className="p-5 font-semibold text-center">Status</th>
                         </tr>
                       </thead>
                       <tbody className="text-sm divide-y divide-slate-100">
-                        {offlineLogs.map((log) => (
+                        {offlineLogs.map((log, index) => (
                           <tr key={log.id} className="hover:bg-red-50/50 transition-colors group">
+                            <td className="p-5 text-center text-slate-400 font-medium">{offset + index + 1}</td>
                             <td className="p-5 whitespace-nowrap">
                               <div className="text-slate-700 font-medium">{new Date(log.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })}</div>
                               <div className="text-slate-400 text-xs mt-0.5">{new Date(log.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })} WIB</div>
@@ -344,7 +346,7 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                         ))}
                         {offlineLogs.length === 0 && (
                           <tr>
-                            <td colSpan={3} className="p-10 text-center text-slate-500 text-sm font-medium">Belum ada riwayat kamera mati.</td>
+                            <td colSpan={4} className="p-10 text-center text-slate-500 text-sm font-medium">Belum ada riwayat kamera mati.</td>
                           </tr>
                         )}
                       </tbody>
@@ -382,14 +384,16 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                     <table className="w-full text-left border-collapse">
                       <thead>
                         <tr className="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider border-b border-slate-100">
+                          <th className="p-5 font-semibold text-center w-16">No</th>
                           <th className="p-5 font-semibold">Waktu Pemulihan</th>
                           <th className="p-5 font-semibold">Perangkat</th>
                           <th className="p-5 font-semibold text-center">Status</th>
                         </tr>
                       </thead>
                       <tbody className="text-sm divide-y divide-slate-100">
-                        {onlineLogs.map((log) => (
+                        {onlineLogs.map((log, index) => (
                           <tr key={log.id} className="hover:bg-emerald-50/50 transition-colors group">
+                            <td className="p-5 text-center text-slate-400 font-medium">{offset + index + 1}</td>
                             <td className="p-5 whitespace-nowrap">
                               <div className="text-slate-700 font-medium">{new Date(log.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })}</div>
                               <div className="text-slate-400 text-xs mt-0.5">{new Date(log.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })} WIB</div>
@@ -407,7 +411,7 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                         ))}
                         {onlineLogs.length === 0 && (
                           <tr>
-                            <td colSpan={3} className="p-10 text-center text-slate-500 text-sm font-medium">Belum ada riwayat kamera menyala.</td>
+                            <td colSpan={4} className="p-10 text-center text-slate-500 text-sm font-medium">Belum ada riwayat kamera menyala.</td>
                           </tr>
                         )}
                       </tbody>
@@ -449,6 +453,7 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                     <table className="w-full text-left border-collapse">
                       <thead>
                         <tr className="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider border-b border-slate-100">
+                          <th className="p-5 font-semibold text-center w-16">No</th>
                           <th className="p-5 font-semibold">Nama Perangkat</th>
                           <th className="p-5 font-semibold">ID Perangkat</th>
                           <th className="p-5 font-semibold text-center">Status Terakhir</th>
@@ -456,10 +461,11 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                         </tr>
                       </thead>
                       <tbody className="text-sm divide-y divide-slate-100">
-                        {devices.map((dev) => {
+                        {devices.map((dev, index) => {
                           const isOnline = dev.status === 'online';
                           return (
                             <tr key={dev.device_id} className="hover:bg-blue-50/40 transition-colors group">
+                              <td className="p-5 text-center text-slate-400 font-medium">{index + 1}</td>
                               <td className="p-5">
                                 <Link href={`?tab=${tab}&history=${dev.device_id}`} className="font-semibold text-slate-800 group-hover:text-blue-700 transition-colors underline decoration-transparent hover:decoration-blue-700">
                                   {dev.device_name}
@@ -486,7 +492,7 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                         })}
                         {devices.length === 0 && (
                           <tr>
-                            <td colSpan={4} className="p-12 text-center">
+                            <td colSpan={5} className="p-12 text-center">
                               <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-blue-50 mb-4">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
                               </div>
@@ -523,13 +529,15 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                     <table className="w-full text-left border-collapse">
                       <thead className="sticky top-0 bg-white/95 backdrop-blur-sm shadow-sm z-10">
                         <tr className="text-slate-500 text-xs uppercase tracking-wider border-b border-slate-100">
+                          <th className="p-4 font-semibold text-center w-12">No</th>
                           <th className="p-4 font-semibold">Waktu Kejadian</th>
                           <th className="p-4 font-semibold text-center">Status</th>
                         </tr>
                       </thead>
                       <tbody className="text-sm divide-y divide-slate-100">
-                        {historyLogs.map((log, i) => (
-                          <tr key={i} className="hover:bg-slate-50/50 transition-colors">
+                        {historyLogs.map((log, index) => (
+                          <tr key={index} className="hover:bg-slate-50/50 transition-colors">
+                            <td className="p-4 text-center text-slate-400 font-medium text-xs">{index + 1}</td>
                             <td className="p-4">
                               <div className="text-slate-700 font-medium">{new Date(log.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })}</div>
                               <div className="text-slate-400 text-xs mt-0.5">{new Date(log.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })} WIB</div>
@@ -549,7 +557,7 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                         ))}
                         {historyLogs.length === 0 && (
                           <tr>
-                            <td colSpan={2} className="p-8 text-center text-slate-500 text-sm">Belum ada riwayat tercatat.</td>
+                            <td colSpan={3} className="p-8 text-center text-slate-500 text-sm">Belum ada riwayat tercatat.</td>
                           </tr>
                         )}
                       </tbody>
