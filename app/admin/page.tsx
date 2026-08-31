@@ -84,7 +84,7 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
 
   } else if (tab === 'offline') {
     const dateCondition = filterDate ? sql`AND DATE(created_at AT TIME ZONE 'Asia/Jakarta') = ${filterDate}` : sql``;
-    const searchCondition = searchQuery ? sql`AND device_name ILIKE ${'%' + searchQuery + '%'}` : sql``;
+    const searchCondition = searchQuery ? sql`AND (device_name ILIKE ${'%' + searchQuery + '%'} OR device_id ILIKE ${'%' + searchQuery + '%'})` : sql``;
     
     const countResult = await sql`SELECT COUNT(*) FROM notification_logs WHERE status = 'offline' ${dateCondition} ${searchCondition}`;
     totalOfflineItems = parseInt(countResult[0].count);
@@ -98,7 +98,7 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
     `;
   } else if (tab === 'online') {
     const dateCondition = filterDate ? sql`AND DATE(created_at AT TIME ZONE 'Asia/Jakarta') = ${filterDate}` : sql``;
-    const searchCondition = searchQuery ? sql`AND device_name ILIKE ${'%' + searchQuery + '%'}` : sql``;
+    const searchCondition = searchQuery ? sql`AND (device_name ILIKE ${'%' + searchQuery + '%'} OR device_id ILIKE ${'%' + searchQuery + '%'})` : sql``;
     
     const countResult = await sql`SELECT COUNT(*) FROM notification_logs WHERE status = 'online' ${dateCondition} ${searchCondition}`;
     totalOnlineItems = parseInt(countResult[0].count);
@@ -111,7 +111,7 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
       LIMIT ${itemsPerPage} OFFSET ${offset}
     `;
   } else if (tab === 'devices') {
-    const searchCondition = searchQuery ? sql`WHERE device_name ILIKE ${'%' + searchQuery + '%'}` : sql``;
+    const searchCondition = searchQuery ? sql`WHERE device_name ILIKE ${'%' + searchQuery + '%'} OR device_id ILIKE ${'%' + searchQuery + '%'}` : sql``;
     devices = await sql`
       SELECT device_id, device_name, status, last_synced_at
       FROM devices
