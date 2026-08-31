@@ -171,49 +171,49 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                 {/* Section 1: Summary Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {/* Total Cameras Card */}
-                  <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex items-center gap-6 relative overflow-hidden">
+                  <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex items-center gap-5 relative overflow-hidden">
                     <div className="absolute top-0 right-0 p-4 opacity-5">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-24 w-24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-20 w-20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
                     </div>
-                    <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center flex-shrink-0 border border-blue-100">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                    <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center flex-shrink-0 border border-blue-100">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Total Kamera</p>
-                      <h3 className="text-3xl font-bold text-slate-800 mt-1">{totalDevices}</h3>
+                      <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Kamera</p>
+                      <h3 className="text-2xl font-bold text-slate-800 mt-0.5">{totalDevices}</h3>
                     </div>
                   </div>
 
                   {/* Online Cameras Card */}
-                  <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex items-center gap-6 relative overflow-hidden">
+                  <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex items-center gap-5 relative overflow-hidden">
                     <div className="absolute top-0 right-0 p-4 opacity-5">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-24 w-24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-20 w-20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                     </div>
-                    <div className="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center flex-shrink-0 border border-emerald-100">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center flex-shrink-0 border border-emerald-100">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Kamera Aktif</p>
-                      <div className="flex items-end gap-2 mt-1">
-                        <h3 className="text-3xl font-bold text-emerald-600">{onlineCount}</h3>
-                        <span className="text-sm text-emerald-500 font-medium mb-1">Beroperasi</span>
+                      <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Kamera Aktif</p>
+                      <div className="flex items-end gap-1.5 mt-0.5">
+                        <h3 className="text-2xl font-bold text-emerald-600">{onlineCount}</h3>
+                        <span className="text-xs text-emerald-500 font-medium mb-1">Beroperasi</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Offline Cameras Card */}
-                  <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex items-center gap-6 relative overflow-hidden">
+                  <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex items-center gap-5 relative overflow-hidden">
                     <div className="absolute top-0 right-0 p-4 opacity-5">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-24 w-24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-20 w-20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                     </div>
-                    <div className="w-14 h-14 rounded-2xl bg-red-50 flex items-center justify-center flex-shrink-0 border border-red-100">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-red-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    <div className="w-12 h-12 rounded-2xl bg-red-50 flex items-center justify-center flex-shrink-0 border border-red-100">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-red-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Kamera Mati</p>
-                      <div className="flex items-end gap-2 mt-1">
-                        <h3 className="text-3xl font-bold text-red-600">{offlineCount}</h3>
-                        <span className="text-sm text-red-500 font-medium mb-1">Perlu Perhatian</span>
+                      <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Kamera Mati</p>
+                      <div className="flex items-end gap-1.5 mt-0.5">
+                        <h3 className="text-2xl font-bold text-red-600">{offlineCount}</h3>
+                        <span className="text-xs text-red-500 font-medium mb-1">Perlu Perhatian</span>
                       </div>
                     </div>
                   </div>
