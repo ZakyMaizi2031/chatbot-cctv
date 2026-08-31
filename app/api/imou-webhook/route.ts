@@ -150,19 +150,21 @@ export async function POST(req: Request) {
           if (token) {
             let finalStatus = 'unknown'; // Default ke unknown biar aman kalau IMOU error
             for (let i = 1; i <= 3; i++) {
-              // Tunggu 15 detik per ping untuk nahan False Alarm
+              // Tunggu 15 detik per ping
               await new Promise(resolve => setTimeout(resolve, 15000));
               
               const currentStatus = await checkDeviceStatus(token, deviceId);
               console.log(`Ping ${i} untuk ${cname}: status = ${currentStatus}`);
               
-              if (currentStatus === 'online') {
-                finalStatus = 'online';
-                console.log(`Batal kirim notifikasi mati: CCTV ${cname} ternyata sudah online di ping ke-${i}`);
-                break;
-              } else if (currentStatus === 'offline') {
-                finalStatus = 'offline';
-              }
+              finalStatus = currentStatus;
+              
+              // JANGAN batalkan loop di tengah jalan.
+              // API IMOU kadang lambat update (delay 20-30 detik).
+              // Kita kumpulkan hasil sampai ping ke-3 (45 detik) baru ambil keputusan akhir.
+            }
+            
+            if (finalStatus === 'online') {
+              console.log(`Batal kirim notifikasi mati: Setelah 45 detik, CCTV ${cname} terdeteksi ONLINE (False Alarm atau API telat update).`);
             }
             
             // HANYA kirim pesan jika beneran terbukti OFFLINE (menolak error 'unknown')
@@ -191,7 +193,11 @@ export async function POST(req: Request) {
 Mohon segera dicek oleh teknisi.`;
 
           const teleRes = await sendTelegramAlert(message);
-          if (!teleRes.ok) console.error("Telegram API Error:", await teleRes.json());
+          if (!teleRes.ok) {
+            console.error("Telegram API Error:", await teleRes.json());
+          } else {
+            console.log(`[SUKSES] Notifikasi OFFLINE terkirim ke Telegram untuk ${cname}`);
+          }
           
           // Log ke database Neon dan update tabel devices
           try {
@@ -202,6 +208,7 @@ Mohon segera dicek oleh teknisi.`;
             await sql`
               UPDATE devices SET status = 'offline' WHERE device_id = ${deviceId}
             `;
+            console.log(`[SUKSES] Database diupdate menjadi OFFLINE untuk ${cname}`);
           } catch (dbErr) {
             console.error("Database Error (Offline Log):", dbErr);
           }
@@ -238,7 +245,11 @@ Mohon segera dicek oleh teknisi.`;
 CCTV telah beroperasi dan terhubung kembali.`;
 
             const teleRes = await sendTelegramAlert(message);
-            if (!teleRes.ok) console.error("Telegram API Error:", await teleRes.json());
+            if (!teleRes.ok) {
+              console.error("Telegram API Error:", await teleRes.json());
+            } else {
+              console.log(`[SUKSES] Notifikasi ONLINE terkirim ke Telegram untuk ${cname}`);
+            }
             
             // Log ke database Neon
             try {
@@ -246,6 +257,7 @@ CCTV telah beroperasi dan terhubung kembali.`;
                 INSERT INTO notification_logs (device_id, device_name, status)
                 VALUES (${deviceId}, ${cname}, 'online')
               `;
+              console.log(`[SUKSES] Database diupdate menjadi ONLINE untuk ${cname}`);
             } catch (dbErr) {
               console.error("Database Error (Online Log):", dbErr);
             }
