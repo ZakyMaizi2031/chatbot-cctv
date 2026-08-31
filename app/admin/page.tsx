@@ -302,10 +302,10 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
             {tab === 'offline' && (
               <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                  <div className="p-6 border-b border-slate-100 bg-red-50/30 flex items-center justify-between">
+                  <div className="p-4 border-b border-slate-100 bg-red-50/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
                     <div>
-                      <h2 className="text-lg font-bold flex items-center gap-2 text-red-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                      <h2 className="text-base font-bold flex items-center gap-2 text-red-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                         Riwayat Kamera Mati (Offline)
                       </h2>
                       <p className="text-sm text-slate-500 mt-1">Daftar notifikasi peringatan CCTV mati terbaru.</p>
@@ -318,27 +318,27 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                   <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                       <thead>
-                        <tr className="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider border-b border-slate-100">
-                          <th className="py-3 px-5 font-semibold text-center w-16">No</th>
-                          <th className="py-3 px-5 font-semibold">Waktu Kejadian</th>
-                          <th className="py-3 px-5 font-semibold">Perangkat</th>
-                          <th className="py-3 px-5 font-semibold text-center">Status</th>
+                        <tr className="bg-slate-50 text-slate-500 text-[11px] uppercase tracking-wider border-b border-slate-100">
+                          <th className="py-2 px-4 font-semibold text-center w-12">No</th>
+                          <th className="py-2 px-4 font-semibold">Waktu Kejadian</th>
+                          <th className="py-2 px-4 font-semibold">Perangkat</th>
+                          <th className="py-2 px-4 font-semibold text-center">Status</th>
                         </tr>
                       </thead>
                       <tbody className="text-sm divide-y divide-slate-100">
                         {offlineLogs.map((log, index) => (
                           <tr key={log.id} className="hover:bg-red-50/50 transition-colors group">
-                            <td className="py-3 px-5 text-center text-slate-400 font-medium">{offset + index + 1}</td>
-                            <td className="py-3 px-5 whitespace-nowrap">
-                              <div className="text-slate-700 font-medium">{new Date(log.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })}</div>
-                              <div className="text-slate-400 text-xs mt-0.5">{new Date(log.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })} WIB</div>
+                            <td className="py-1.5 px-4 text-center text-slate-400 font-medium text-xs">{offset + index + 1}</td>
+                            <td className="py-1.5 px-4 whitespace-nowrap">
+                              <div className="text-slate-700 font-medium text-sm">{new Date(log.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })}</div>
+                              <div className="text-slate-400 text-xs mt-0">{new Date(log.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })} WIB</div>
                             </td>
-                            <td className="py-3 px-5">
-                              <div className="font-semibold text-slate-800">{log.device_name}</div>
-                              <div className="text-slate-400 font-mono text-xs mt-0.5">{log.device_id}</div>
+                            <td className="py-1.5 px-4">
+                              <div className="font-semibold text-slate-800 text-sm">{log.device_name}</div>
+                              <div className="text-slate-400 font-mono text-[10px] mt-0">{log.device_id}</div>
                             </td>
-                            <td className="py-3 px-5 text-center">
-                              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border bg-red-50 text-red-600 border-red-200 shadow-sm">
+                            <td className="py-1.5 px-4 text-center">
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold border bg-red-50 text-red-600 border-red-200 shadow-sm">
                                 <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span> OFFLINE
                               </span>
                             </td>
@@ -367,10 +367,10 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
             {tab === 'online' && (
               <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                  <div className="p-6 border-b border-slate-100 bg-emerald-50/30 flex items-center justify-between">
+                  <div className="p-4 border-b border-slate-100 bg-emerald-50/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
                     <div>
-                      <h2 className="text-lg font-bold flex items-center gap-2 text-emerald-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                      <h2 className="text-base font-bold flex items-center gap-2 text-emerald-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                         Riwayat Kamera Nyala (Online)
                       </h2>
                       <p className="text-sm text-slate-500 mt-1">Daftar notifikasi pemulihan CCTV terbaru.</p>
@@ -383,27 +383,27 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                   <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                       <thead>
-                        <tr className="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider border-b border-slate-100">
-                          <th className="py-3 px-5 font-semibold text-center w-16">No</th>
-                          <th className="py-3 px-5 font-semibold">Waktu Pemulihan</th>
-                          <th className="py-3 px-5 font-semibold">Perangkat</th>
-                          <th className="py-3 px-5 font-semibold text-center">Status</th>
+                        <tr className="bg-slate-50 text-slate-500 text-[11px] uppercase tracking-wider border-b border-slate-100">
+                          <th className="py-2 px-4 font-semibold text-center w-12">No</th>
+                          <th className="py-2 px-4 font-semibold">Waktu Pemulihan</th>
+                          <th className="py-2 px-4 font-semibold">Perangkat</th>
+                          <th className="py-2 px-4 font-semibold text-center">Status</th>
                         </tr>
                       </thead>
                       <tbody className="text-sm divide-y divide-slate-100">
                         {onlineLogs.map((log, index) => (
                           <tr key={log.id} className="hover:bg-emerald-50/50 transition-colors group">
-                            <td className="py-3 px-5 text-center text-slate-400 font-medium">{offset + index + 1}</td>
-                            <td className="py-3 px-5 whitespace-nowrap">
-                              <div className="text-slate-700 font-medium">{new Date(log.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })}</div>
-                              <div className="text-slate-400 text-xs mt-0.5">{new Date(log.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })} WIB</div>
+                            <td className="py-1.5 px-4 text-center text-slate-400 font-medium text-xs">{offset + index + 1}</td>
+                            <td className="py-1.5 px-4 whitespace-nowrap">
+                              <div className="text-slate-700 font-medium text-sm">{new Date(log.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })}</div>
+                              <div className="text-slate-400 text-xs mt-0">{new Date(log.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })} WIB</div>
                             </td>
-                            <td className="py-3 px-5">
-                              <div className="font-semibold text-slate-800">{log.device_name}</div>
-                              <div className="text-slate-400 font-mono text-xs mt-0.5">{log.device_id}</div>
+                            <td className="py-1.5 px-4">
+                              <div className="font-semibold text-slate-800 text-sm">{log.device_name}</div>
+                              <div className="text-slate-400 font-mono text-[10px] mt-0">{log.device_id}</div>
                           </td>
-                            <td className="py-3 px-5 text-center">
-                              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border bg-emerald-50 text-emerald-600 border-emerald-200 shadow-sm">
+                            <td className="py-1.5 px-4 text-center">
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold border bg-emerald-50 text-emerald-600 border-emerald-200 shadow-sm">
                                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> ONLINE
                               </span>
                             </td>
