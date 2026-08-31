@@ -14,7 +14,7 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
   const currentPage = parseInt(searchParams.page || '1') || 1;
   const filterDate = searchParams.date || null;
   const searchQuery = searchParams.search || null;
-  const itemsPerPage = 30;
+  const itemsPerPage = 10;
   const offset = (currentPage - 1) * itemsPerPage;
 
   // State Variables
@@ -319,25 +319,25 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                     <table className="w-full text-left border-collapse">
                       <thead>
                         <tr className="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider border-b border-slate-100">
-                          <th className="p-5 font-semibold text-center w-16">No</th>
-                          <th className="p-5 font-semibold">Waktu Kejadian</th>
-                          <th className="p-5 font-semibold">Perangkat</th>
-                          <th className="p-5 font-semibold text-center">Status</th>
+                          <th className="py-3 px-5 font-semibold text-center w-16">No</th>
+                          <th className="py-3 px-5 font-semibold">Waktu Kejadian</th>
+                          <th className="py-3 px-5 font-semibold">Perangkat</th>
+                          <th className="py-3 px-5 font-semibold text-center">Status</th>
                         </tr>
                       </thead>
                       <tbody className="text-sm divide-y divide-slate-100">
                         {offlineLogs.map((log, index) => (
                           <tr key={log.id} className="hover:bg-red-50/50 transition-colors group">
-                            <td className="p-5 text-center text-slate-400 font-medium">{offset + index + 1}</td>
-                            <td className="p-5 whitespace-nowrap">
+                            <td className="py-3 px-5 text-center text-slate-400 font-medium">{offset + index + 1}</td>
+                            <td className="py-3 px-5 whitespace-nowrap">
                               <div className="text-slate-700 font-medium">{new Date(log.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })}</div>
                               <div className="text-slate-400 text-xs mt-0.5">{new Date(log.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })} WIB</div>
                             </td>
-                            <td className="p-5">
+                            <td className="py-3 px-5">
                               <div className="font-semibold text-slate-800">{log.device_name}</div>
                               <div className="text-slate-400 font-mono text-xs mt-0.5">{log.device_id}</div>
                             </td>
-                            <td className="p-5 text-center">
+                            <td className="py-3 px-5 text-center">
                               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border bg-red-50 text-red-600 border-red-200 shadow-sm">
                                 <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span> OFFLINE
                               </span>
@@ -384,25 +384,25 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                     <table className="w-full text-left border-collapse">
                       <thead>
                         <tr className="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider border-b border-slate-100">
-                          <th className="p-5 font-semibold text-center w-16">No</th>
-                          <th className="p-5 font-semibold">Waktu Pemulihan</th>
-                          <th className="p-5 font-semibold">Perangkat</th>
-                          <th className="p-5 font-semibold text-center">Status</th>
+                          <th className="py-3 px-5 font-semibold text-center w-16">No</th>
+                          <th className="py-3 px-5 font-semibold">Waktu Pemulihan</th>
+                          <th className="py-3 px-5 font-semibold">Perangkat</th>
+                          <th className="py-3 px-5 font-semibold text-center">Status</th>
                         </tr>
                       </thead>
                       <tbody className="text-sm divide-y divide-slate-100">
                         {onlineLogs.map((log, index) => (
                           <tr key={log.id} className="hover:bg-emerald-50/50 transition-colors group">
-                            <td className="p-5 text-center text-slate-400 font-medium">{offset + index + 1}</td>
-                            <td className="p-5 whitespace-nowrap">
+                            <td className="py-3 px-5 text-center text-slate-400 font-medium">{offset + index + 1}</td>
+                            <td className="py-3 px-5 whitespace-nowrap">
                               <div className="text-slate-700 font-medium">{new Date(log.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })}</div>
                               <div className="text-slate-400 text-xs mt-0.5">{new Date(log.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })} WIB</div>
                             </td>
-                            <td className="p-5">
+                            <td className="py-3 px-5">
                               <div className="font-semibold text-slate-800">{log.device_name}</div>
                               <div className="text-slate-400 font-mono text-xs mt-0.5">{log.device_id}</div>
                           </td>
-                            <td className="p-5 text-center">
+                            <td className="py-3 px-5 text-center">
                               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border bg-emerald-50 text-emerald-600 border-emerald-200 shadow-sm">
                                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> ONLINE
                               </span>
@@ -453,11 +453,11 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                     <table className="w-full text-left border-collapse">
                       <thead>
                         <tr className="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider border-b border-slate-100">
-                          <th className="p-5 font-semibold text-center w-16">No</th>
-                          <th className="p-5 font-semibold">Nama Perangkat</th>
-                          <th className="p-5 font-semibold">ID Perangkat</th>
-                          <th className="p-5 font-semibold text-center">Status Terakhir</th>
-                          <th className="p-5 font-semibold">Terakhir Disinkron</th>
+                          <th className="py-3 px-5 font-semibold text-center w-16">No</th>
+                          <th className="py-3 px-5 font-semibold">Nama Perangkat</th>
+                          <th className="py-3 px-5 font-semibold">ID Perangkat</th>
+                          <th className="py-3 px-5 font-semibold text-center">Status Terakhir</th>
+                          <th className="py-3 px-5 font-semibold">Terakhir Disinkron</th>
                         </tr>
                       </thead>
                       <tbody className="text-sm divide-y divide-slate-100">
@@ -465,14 +465,14 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                           const isOnline = dev.status === 'online';
                           return (
                             <tr key={dev.device_id} className="hover:bg-blue-50/40 transition-colors group">
-                              <td className="p-5 text-center text-slate-400 font-medium">{index + 1}</td>
-                              <td className="p-5">
+                              <td className="py-3 px-5 text-center text-slate-400 font-medium">{index + 1}</td>
+                              <td className="py-3 px-5">
                                 <Link href={`?tab=${tab}&history=${dev.device_id}`} className="font-semibold text-slate-800 group-hover:text-blue-700 transition-colors underline decoration-transparent hover:decoration-blue-700">
                                   {dev.device_name}
                                 </Link>
                               </td>
-                              <td className="p-5 font-mono text-xs text-slate-500">{dev.device_id}</td>
-                              <td className="p-5 text-center">
+                              <td className="py-3 px-5 font-mono text-xs text-slate-500">{dev.device_id}</td>
+                              <td className="py-3 px-5 text-center">
                                 <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border shadow-sm ${
                                   isOnline
                                     ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
@@ -484,7 +484,7 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                                   {dev.status.toUpperCase()}
                                 </span>
                               </td>
-                              <td className="p-5 text-xs text-slate-500 font-medium">
+                              <td className="py-3 px-5 text-xs text-slate-500 font-medium">
                                 {new Date(dev.last_synced_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Jakarta' })}
                               </td>
                             </tr>
