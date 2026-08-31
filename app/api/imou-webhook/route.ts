@@ -45,8 +45,8 @@ async function getAccessToken(): Promise<string> {
 // === Helper: Cek Status Realtime Device ===
 async function checkDeviceStatus(token: string, deviceId: string): Promise<'online'|'offline'|'unknown'> {
   try {
-    // OPSI A: Gunakan listDeviceDetailsByPage (Pasti Berhasil)
-    const body = buildRequestBody({ token, page: 1, pageSize: 100 });
+    // OPSI A: Gunakan listDeviceDetailsByPage (Pasti Berhasil) tapi difilter khusus 1 device biar gak berat
+    const body = buildRequestBody({ token, page: 1, pageSize: 1, deviceIdList: deviceId });
     const res = await fetch(`${IMOU_BASE_URL}/listDeviceDetailsByPage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
