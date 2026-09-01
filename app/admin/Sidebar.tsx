@@ -14,6 +14,9 @@ export default function Sidebar({ user }: { user: any }) {
   if (pathname?.includes('/admin/devices/')) {
     currentTab = 'devices';
   }
+  if (pathname?.includes('/admin/users')) {
+    currentTab = 'users';
+  }
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -128,10 +131,11 @@ export default function Sidebar({ user }: { user: any }) {
         
         {links.map((link) => {
           const isActive = currentTab === link.id;
+          const href = link.id === 'users' ? '/admin/users' : `/admin?tab=${link.id}`;
           return (
             <Link 
               key={link.id}
-              href={`/admin?tab=${link.id}`} 
+              href={href} 
               title={collapsed ? link.label : ''}
               className={`flex items-center gap-3 px-3 py-3 rounded-xl font-semibold transition-all duration-300 ${
                 isActive 
@@ -215,10 +219,11 @@ export default function Sidebar({ user }: { user: any }) {
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-[0_-4px_15px_-5px_rgba(0,0,0,0.05)] z-50 flex items-center justify-around px-2 h-16 pb-safe">
         {links.map((link) => {
           const isActive = currentTab === link.id;
+          const href = link.id === 'users' ? '/admin/users' : `/admin?tab=${link.id}`;
           return (
             <Link
               key={link.id}
-              href={`/admin?tab=${link.id}`}
+              href={href}
               className={`flex flex-col items-center justify-center w-full h-full gap-1 transition-colors ${
                 isActive ? 'text-blue-600' : 'text-slate-400 hover:text-slate-600'
               }`}
