@@ -1,12 +1,16 @@
 import React from 'react';
 import Sidebar from './Sidebar';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth';
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  const session = await getServerSession(authOptions);
+  
   return (
     <div className="flex min-h-screen bg-[#F8FAFC] text-slate-800 font-sans selection:bg-blue-200">
       
       {/* Sidebar - Client Component */}
-      <Sidebar />
+      <Sidebar user={session?.user} />
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">

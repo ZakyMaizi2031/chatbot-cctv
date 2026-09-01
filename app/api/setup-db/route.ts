@@ -24,6 +24,25 @@ export async function GET() {
       )
     `;
 
+    // 3. Buat tabel users untuk SSO (Management User)
+    await sql`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        email VARCHAR(255) UNIQUE NOT NULL,
+        name VARCHAR(255),
+        image VARCHAR(255),
+        role VARCHAR(50) DEFAULT 'admin',
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      )
+    `;
+
+    // 4. Masukkan Admin Utama (Zaky)
+    await sql`
+      INSERT INTO users (email, name, role)
+      VALUES ('zaky@cnt.id', 'Zaky', 'admin')
+      ON CONFLICT (email) DO NOTHING
+    `;
+
     // 2. Bersihkan tabel (opsional, agar tidak duplikat jika dijalankan berulang)
     // await sql`TRUNCATE TABLE notification_logs`;
 

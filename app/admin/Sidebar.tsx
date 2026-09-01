@@ -4,7 +4,9 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSearchParams, usePathname } from 'next/navigation';
 
-export default function Sidebar() {
+import { signOut } from 'next-auth/react';
+
+export default function Sidebar({ user }: { user: any }) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   
@@ -71,6 +73,18 @@ export default function Sidebar() {
       )
     }
   ];
+
+  if (user?.role === 'admin') {
+    links.push({
+      id: 'users',
+      label: 'Manajemen Pengguna',
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+      )
+    });
+  }
 
   return (
     <>
@@ -141,18 +155,60 @@ export default function Sidebar() {
         })}
       </nav>
       
-      {/* Footer Info */}
-      <div className={`p-4 border-t border-slate-200 mt-auto overflow-hidden transition-all duration-300 ${
-        collapsed ? 'h-0 opacity-0 py-0 border-transparent' : 'h-auto opacity-100'
+      {/* Footer Info & Profile */}
+      <div className={`mt-auto overflow-hidden transition-all duration-300 ${
+        collapsed ? 'opacity-0 h-0 hidden' : 'opacity-100'
       }`}>
-        <div className="flex items-center gap-2 bg-emerald-50 px-3 py-2 rounded-lg border border-emerald-100 shadow-sm">
-          <span className="relative flex h-2.5 w-2.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-          </span>
-          <span className="text-xs font-semibold text-emerald-700 truncate">System Online</span>
+        {/* Status Indicator */}
+        <div className="p-4 pt-0">
+          <div className="flex items-center gap-2 bg-emerald-50 px-3 py-2 rounded-lg border border-emerald-100 shadow-sm">
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+            </span>
+            <span className="text-xs font-semibold text-emerald-700 truncate">System Online</span>
+          </div>
+        </div>
+
+        {/* User Profile */}
+        <div className="p-4 border-t border-slate-200/60 bg-white/50">
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-3">
+              {user?.image ? (
+                <img src={user.image} alt={user.name || "User"} className="w-10 h-10 rounded-full border border-slate-200 shadow-sm" />
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center font-bold text-blue-600 border border-blue-200 shadow-sm">
+                  {(user?.name || user?.email || "U").charAt(0).toUpperCase()}
+                </div>
+              )}
+              <div className="flex flex-col min-w-0">
+                <span className="text-sm font-bold text-slate-800 truncate">{user?.name || user?.email || "Admin"}</span>
+                <span className="text-[10px] font-medium text-slate-500 uppercase tracking-wider">{user?.role}</span>
+              </div>
+            </div>
+            <button 
+              onClick={() => signOut({ callbackUrl: "/login" })}
+              className="flex items-center justify-center gap-2 w-full py-2 px-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-xs font-semibold transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+              Keluar Sesi
+            </button>
+          </div>
         </div>
       </div>
+
+      {collapsed && (
+        <div className="mt-auto p-4 flex justify-center border-t border-slate-200/60 bg-white/50">
+          <button 
+            onClick={() => signOut({ callbackUrl: "/login" })}
+            title="Keluar"
+            className="w-10 h-10 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-xl transition-colors shrink-0"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+          </button>
+        </div>
+      )}
+
       </aside>
 
       {/* --- MOBILE BOTTOM NAVIGATION --- */}
