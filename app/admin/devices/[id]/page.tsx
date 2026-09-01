@@ -45,10 +45,10 @@ export default async function DeviceDetailPage(props: { params: Promise<{ id: st
   `;
 
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-6">
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-4">
       {/* Device Details Card */}
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-        <div className="p-5 border-b border-slate-100 bg-slate-50/50 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="p-4 border-b border-slate-100 bg-slate-50/50 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
           <div>
             <h2 className="text-lg font-bold text-slate-800">{detailDeviceData.device_name}</h2>
             <p className="text-sm text-slate-500 font-mono mt-1">{detailDeviceData.device_id}</p>
@@ -73,7 +73,7 @@ export default async function DeviceDetailPage(props: { params: Promise<{ id: st
             </Link>
           </div>
         </div>
-        <div className="p-5 grid grid-cols-1 sm:grid-cols-3 gap-4 bg-white">
+        <div className="p-4 grid grid-cols-1 sm:grid-cols-3 gap-3 bg-white">
           <div>
             <p className="text-xs text-slate-500 mb-1">Total Online</p>
             <p className="text-lg font-bold text-emerald-600">{detailOnlineCount}x</p>
@@ -107,7 +107,7 @@ export default async function DeviceDetailPage(props: { params: Promise<{ id: st
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-        <div className="p-5 border-b border-slate-100 bg-indigo-50/30">
+        <div className="p-4 border-b border-slate-100 bg-indigo-50/30">
           <h2 className="text-base font-bold flex items-center gap-2 text-indigo-600">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
             Riwayat Aktivitas Perangkat
