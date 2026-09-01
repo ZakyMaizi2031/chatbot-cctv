@@ -142,7 +142,7 @@ export async function POST(req: Request) {
       if (currentState === 'offline') {
         console.log(`CCTV ${cname} (${deviceId}) sudah offline sebelumnya. Abaikan pesan ganda.`);
       } else {
-        console.log(`Mendeteksi CCTV ${cname} offline, memulai proses ping verifikasi (3x, jeda 15s)...`);
+        console.log(`Mendeteksi CCTV ${cname} offline, memulai proses ping verifikasi (3x, jeda 14s)...`);
         
         let isConfirmedOffline = false;
         try {
@@ -150,8 +150,8 @@ export async function POST(req: Request) {
           if (token) {
             let finalStatus = 'unknown'; // Default ke unknown biar aman kalau IMOU error
             for (let i = 1; i <= 3; i++) {
-              // Tunggu 15 detik per ping
-              await new Promise(resolve => setTimeout(resolve, 15000));
+              // Tunggu 14 detik per ping
+              await new Promise(resolve => setTimeout(resolve, 14000));
               
               const currentStatus = await checkDeviceStatus(token, deviceId);
               console.log(`Ping ${i} untuk ${cname}: status = ${currentStatus}`);
@@ -160,11 +160,11 @@ export async function POST(req: Request) {
               
               // JANGAN batalkan loop di tengah jalan.
               // API IMOU kadang lambat update (delay 20-30 detik).
-              // Kita kumpulkan hasil sampai ping ke-3 (45 detik) baru ambil keputusan akhir.
+              // Kita kumpulkan hasil sampai ping ke-3 (42 detik) baru ambil keputusan akhir.
             }
             
             if (finalStatus === 'online') {
-              console.log(`Batal kirim notifikasi mati: Setelah 45 detik, CCTV ${cname} terdeteksi ONLINE (False Alarm atau API telat update).`);
+              console.log(`Batal kirim notifikasi mati: Setelah 42 detik, CCTV ${cname} terdeteksi ONLINE (False Alarm atau API telat update).`);
             }
             
             // HANYA kirim pesan jika beneran terbukti OFFLINE (menolak error 'unknown')
