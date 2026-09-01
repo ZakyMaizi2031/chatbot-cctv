@@ -2,8 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useSearchParams, usePathname } from 'next/navigation';
 
-export default function Sidebar({ currentTab }: { currentTab: string }) {
+export default function Sidebar() {
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  
+  let currentTab = searchParams.get('tab') || 'dashboard';
+  if (pathname?.includes('/admin/devices/')) {
+    currentTab = 'devices';
+  }
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -109,7 +117,7 @@ export default function Sidebar({ currentTab }: { currentTab: string }) {
           return (
             <Link 
               key={link.id}
-              href={`?tab=${link.id}`} 
+              href={`/admin?tab=${link.id}`} 
               title={collapsed ? link.label : ''}
               className={`flex items-center gap-3 px-3 py-3 rounded-xl font-semibold transition-all duration-300 ${
                 isActive 
@@ -154,7 +162,7 @@ export default function Sidebar({ currentTab }: { currentTab: string }) {
           return (
             <Link
               key={link.id}
-              href={`?tab=${link.id}`}
+              href={`/admin?tab=${link.id}`}
               className={`flex flex-col items-center justify-center w-full h-full gap-1 transition-colors ${
                 isActive ? 'text-blue-600' : 'text-slate-400 hover:text-slate-600'
               }`}
