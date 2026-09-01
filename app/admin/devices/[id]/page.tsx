@@ -47,61 +47,60 @@ export default async function DeviceDetailPage(props: { params: Promise<{ id: st
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-4">
       {/* Device Details Card */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-        <div className="p-4 border-b border-slate-100 bg-slate-50/50 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
-          <div>
-            <h2 className="text-lg font-bold text-slate-800">{detailDeviceData.device_name}</h2>
-            <p className="text-sm text-slate-500 font-mono mt-1">{detailDeviceData.device_id}</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="text-right hidden sm:block">
-              <p className="text-xs text-slate-500 mb-1">Status Saat Ini</p>
-              <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border shadow-sm ${
-                detailDeviceData.status === 'online'
-                  ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
-                  : detailDeviceData.status === 'unknown'
-                    ? 'bg-slate-50 text-slate-500 border-slate-200'
-                    : 'bg-red-50 text-red-600 border-red-200'
-              }`}>
-                <span className={`w-1.5 h-1.5 rounded-full ${detailDeviceData.status === 'online' ? 'bg-emerald-500' : detailDeviceData.status === 'unknown' ? 'bg-slate-400' : 'bg-red-500 animate-pulse'}`}></span>
-                {detailDeviceData.status.toUpperCase()}
-              </span>
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden p-4 md:p-5">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+          
+          <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8 flex-1">
+            {/* Device Identity */}
+            <div>
+              <h2 className="text-xl font-bold text-slate-800 leading-tight">{detailDeviceData.device_name}</h2>
+              <p className="text-sm text-slate-500 font-mono mt-0.5">{detailDeviceData.device_id}</p>
             </div>
-            <Link href="/admin?tab=devices" className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-sm font-semibold transition-colors shadow-sm">
+
+            <div className="hidden md:block h-10 w-px bg-slate-200"></div>
+
+            {/* Stats Row */}
+            <div className="flex flex-wrap items-center gap-y-3 gap-x-6">
+              <div>
+                <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider mb-1">Status Saat Ini</p>
+                <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-bold border shadow-sm ${
+                  detailDeviceData.status === 'online'
+                    ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
+                    : detailDeviceData.status === 'unknown'
+                      ? 'bg-slate-50 text-slate-500 border-slate-200'
+                      : 'bg-red-50 text-red-600 border-red-200'
+                }`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${detailDeviceData.status === 'online' ? 'bg-emerald-500' : detailDeviceData.status === 'unknown' ? 'bg-slate-400' : 'bg-red-500 animate-pulse'}`}></span>
+                  {detailDeviceData.status.toUpperCase()}
+                </span>
+              </div>
+              
+              <div>
+                <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider mb-1">Total Online</p>
+                <p className="text-sm font-bold text-emerald-600">{detailOnlineCount}x</p>
+              </div>
+              
+              <div>
+                <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider mb-1">Total Offline</p>
+                <p className="text-sm font-bold text-red-600">{detailOfflineCount}x</p>
+              </div>
+
+              <div>
+                <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider mb-1">Terakhir Disinkronisasi</p>
+                <p className="text-xs font-medium text-slate-700">
+                  {detailDeviceData.last_synced_at 
+                    ? new Date(detailDeviceData.last_synced_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Jakarta' }) + ' WIB'
+                    : '-'}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex-shrink-0">
+            <Link href="/admin?tab=devices" className="inline-flex items-center gap-2 px-4 py-2 bg-slate-50 border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-xl text-sm font-semibold transition-colors shadow-sm">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
               Kembali
             </Link>
-          </div>
-        </div>
-        <div className="p-4 grid grid-cols-1 sm:grid-cols-3 gap-3 bg-white">
-          <div>
-            <p className="text-xs text-slate-500 mb-1">Total Online</p>
-            <p className="text-lg font-bold text-emerald-600">{detailOnlineCount}x</p>
-          </div>
-          <div>
-            <p className="text-xs text-slate-500 mb-1">Total Offline</p>
-            <p className="text-lg font-bold text-red-600">{detailOfflineCount}x</p>
-          </div>
-          <div>
-            <p className="text-xs text-slate-500 mb-1">Terakhir Disinkronisasi</p>
-            <p className="text-sm font-medium text-slate-700">
-              {detailDeviceData.last_synced_at 
-                ? new Date(detailDeviceData.last_synced_at).toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short', timeZone: 'Asia/Jakarta' }) + ' WIB'
-                : 'Belum pernah sinkronisasi'}
-            </p>
-          </div>
-          <div className="sm:hidden">
-            <p className="text-xs text-slate-500 mb-1">Status Saat Ini</p>
-            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border shadow-sm ${
-              detailDeviceData.status === 'online'
-                ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
-                : detailDeviceData.status === 'unknown'
-                  ? 'bg-slate-50 text-slate-500 border-slate-200'
-                  : 'bg-red-50 text-red-600 border-red-200'
-            }`}>
-              <span className={`w-1.5 h-1.5 rounded-full ${detailDeviceData.status === 'online' ? 'bg-emerald-500' : detailDeviceData.status === 'unknown' ? 'bg-slate-400' : 'bg-red-500 animate-pulse'}`}></span>
-              {detailDeviceData.status.toUpperCase()}
-            </span>
           </div>
         </div>
       </div>
