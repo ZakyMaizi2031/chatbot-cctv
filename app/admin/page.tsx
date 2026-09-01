@@ -254,12 +254,14 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
                                 <span className="text-xs font-semibold text-slate-400">
                                   {new Date(log.created_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Jakarta' })} WIB
                                 </span>
-                                <span className="font-bold text-slate-800 mt-1 leading-snug">
-                                  {log.device_name}
-                                </span>
-                                <span className={`text-sm font-medium mt-1 ${isOnline ? 'text-emerald-600' : 'text-red-600'}`}>
-                                  {isOnline ? 'Kembali Online (Normal)' : 'Terputus (Offline)'}
-                                </span>
+                                <div className="flex items-center gap-2 mt-1 flex-wrap">
+                                  <span className="font-bold text-slate-800 leading-snug">
+                                    {log.device_name}
+                                  </span>
+                                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-md ${isOnline ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
+                                    {isOnline ? 'Kembali Online (Normal)' : 'Terputus (Offline)'}
+                                  </span>
+                                </div>
                               </div>
                             </div>
                           );
