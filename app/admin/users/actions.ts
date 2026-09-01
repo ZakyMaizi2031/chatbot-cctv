@@ -21,13 +21,3 @@ export async function addUser(email: string, name: string) {
   }
 }
 
-export async function deleteUser(userId: number) {
-  try {
-    await sql`DELETE FROM users WHERE id = ${userId}`;
-    revalidatePath("/admin/users");
-    return { success: true };
-  } catch (error: any) {
-    console.error("Failed to delete user:", error);
-    return { error: "Gagal menghapus pengguna." };
-  }
-}
