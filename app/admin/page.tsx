@@ -85,7 +85,7 @@ export default async function AdminPanel(props: { searchParams: Promise<{ tab?: 
       SELECT id, device_id, device_name, status, created_at
       FROM notification_logs
       ORDER BY created_at DESC
-      LIMIT 15
+      LIMIT 9
     `;
 
   } else if (tab === 'offline') {
