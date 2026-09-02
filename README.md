@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Kreativa CCTV Monitoring Dashboard
 
-## Getting Started
+Sistem monitoring terpusat untuk memantau status jaringan kamera CCTV secara real-time. Aplikasi ini dibangun dengan arsitektur modern untuk memastikan kecepatan, keamanan, dan skalabilitas.
 
-First, run the development server:
+## 🚀 Fitur Utama
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Real-time Monitoring**: Memantau status (Online/Offline) seluruh kamera CCTV secara terpusat.
+- **Riwayat Aktivitas**: Mencatat setiap kejadian koneksi terputus dan tersambung kembali beserta waktu detailnya.
+- **Detail Perangkat**: Menampilkan statistik komprehensif untuk masing-masing kamera (frekuensi kerusakan, waktu sinkronisasi terakhir).
+- **Sistem Keamanan SSO**: Autentikasi menggunakan Google Single Sign-On (SSO) yang dikombinasikan dengan *Role-Based Access Control* (RBAC). Hanya email yang terdaftar di database sebagai admin yang dapat masuk.
+- **Manajemen Pengguna (Aman)**: Fitur penambahan admin baru oleh sesama admin, namun penghapusan dikunci di tingkat database untuk mencegah penghapusan sepihak (keamanan tinggi).
+
+## 🛠️ Teknologi yang Digunakan
+
+Aplikasi ini mengimplementasikan prinsip *Clean Architecture* dan *Modern Web Stack*:
+- **Framework**: [Next.js 15 (App Router)](https://nextjs.org/) - Memberikan performa maksimal dengan Server Components.
+- **Bahasa**: [TypeScript](https://www.typescriptlang.org/) - *Type-safe code* untuk mencegah *runtime errors*.
+- **Database**: [Neon Serverless Postgres](https://neon.tech/) - Skalabilitas tinggi dengan integrasi `@vercel/postgres`.
+- **Autentikasi**: [NextAuth.js (v4)](https://next-auth.js.org/) - Sistem *session* berbasis JWT dan OAuth 2.0.
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/) - Desain UI yang modern, responsif, dan elegan.
+
+## 📂 Struktur Proyek Terpenting
+
+- `/app/admin` - Berisi halaman dashboard, riwayat, dan detail perangkat. Memisahkan logika UI (seperti `Sidebar.tsx` dan `Pagination.tsx`) untuk *Clean Code*.
+- `/app/admin/users` - Modul manajemen pengguna khusus admin.
+- `/app/api` - Endpoint API untuk webhook dari sistem Imou dan callback autentikasi.
+- `/lib` - File konfigurasi inti (`auth.ts` untuk NextAuth dan `db.ts` untuk koneksi database).
+
+## 🔒 Variabel Lingkungan (.env)
+
+Sistem ini membutuhkan beberapa variabel lingkungan agar dapat berjalan. Harap jangan pernah mempublikasikan file `.env` Anda.
+
+```env
+# Database Neon
+DATABASE_URL="..."
+
+# Google SSO
+GOOGLE_CLIENT_ID="..."
+GOOGLE_CLIENT_SECRET="..."
+
+# NextAuth
+NEXTAUTH_SECRET="..."
+NEXTAUTH_URL="http://localhost:3000"
+
+# (Opsional) Integrasi Lain
+TELEGRAM_BOT_TOKEN="..."
+TELEGRAM_CHAT_ID="..."
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ⚙️ Cara Menjalankan di Lokal
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Pastikan Anda telah menginstal Node.js dan clone repositori ini.
+2. Instal dependensi:
+   ```bash
+   npm install
+   ```
+3. Salin file `.env.example` menjadi `.env` dan isi dengan kredensial Anda.
+4. Jalankan server:
+   ```bash
+   npm run dev
+   ```
+5. Buka `http://localhost:3000` di browser.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+*Dibuat untuk mempermudah pemantauan keamanan dengan sistem yang andal dan mudah diskalakan.*
